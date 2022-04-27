@@ -1,70 +1,51 @@
-# Getting Started with Create React App
+## TSE Demo Builder
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This application is designed to enable quick TSE demos that mimic a client environment. 
 
-## Available Scripts
 
-In the project directory, you can run:
 
-### `npm start`
+
+### Step 1: `npm start`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Step 2: Click the Gear Icon
 
-### `npm test`
+This will open the configuration menu. 
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Step 3: Customize your Demo
 
-### `npm run build`
+Provide the required fields:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+#### Settings Name 
+This is the name of your configuration settings. When you click save, the file will be saved with this name, allowing for re-use. 
+#### Thoughtspot URL 
+The URL of your thoughtspot instance. Note that you will need to sign into thoughtspot using your own credentials. This application is not configured for SSO.
+#### Logo Image
+Logo of the company your are demoing to. PNG images work best for transparency reasons.
+#### Primary Color
+This the main color of the nav menu. This will also be the primary text color when an link is hovered over. 
+#### Secondary Color
+Complimentary color used for text, and on-hover menus.
+#### Orientation 
+Whether the navigation menu will be displayed on the left or top of the page
+#### Links
+This is the content that will show up in the nav menu. See Link Configuration for more info.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Link Configuration
+#### Link Name
+This is what will be displayed in the nav menu
+#### Link Type
+None - empty link that does nothing on click
+Search - TS Search embed. The configuration space accepts a list of datasources comma delimited
+Answer - TS Search embed, with a default answer. The configuration space accepts an answer GUID
+Liveboard - TS Liveboard embed. The configuration space accepts a liveboard GUID.
+Menu - This link will expose a sub-menu on hover. Contents of this menu will be determined by the parent dropdown.
+URL - This will embed a webpage within an Iframe. The configuration space accepts any URL. Good for specifying a home page that is the client's actual website.
+##### Link Conifugration Space 
+This is used to provide additional details needed to render the link. See Link Type descriptions above for more information on each option.
+##### Link Parent
+This is used to embed links within menus. First create a Menu Type link and provide a name. Any link that you want to show up within that menu, you will want to set that link's parent attribute to be the menu's name.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
