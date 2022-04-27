@@ -9,16 +9,24 @@ const {
   showSettings,
   newSettings
 } = props
+const thoughtspot_URL = "https://se-thoughtspot-cloud.thoughtspot.cloud/#" 
 
 const [renderType, setRenderType] = useState('')
 const [renderContent, setRenderContent] = useState('')
 
 
 useEffect(() => {
-  init({
-    thoughtSpotHost: settings.URL,
-    authType: AuthType.None,
-  });
+  if (settings.URL){
+    try {
+      init({
+        thoughtSpotHost: settings.URL,
+        authType: AuthType.None,
+      });
+    }
+    catch(err){
+      alert("could not connect to thoughtspot")
+    }
+  }
 }, [])
 
 function renderLink(type,content){
@@ -87,8 +95,11 @@ if (renderType=='Answer'){
   renderPage = <SearchEmbed hideDataSources={true} answerId={renderContent} frameParams={{width:'100%',height:'100vh'}}
   />
 }
+if (renderType=='App'){
+
+}
 if (renderType=='URL'){
-  renderPage = <iframe style={{width:'100%',height:'100%',border:'none'}} src={renderContent}></iframe>
+  renderPage = <iframe primaryNavHidden="true" embedApp="true" style={{width:'100%',height:'100%',border:'none'}} src={renderContent}></iframe>
 }
 
 const logoImageHolder = {
