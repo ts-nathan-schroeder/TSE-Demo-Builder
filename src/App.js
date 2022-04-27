@@ -13,7 +13,7 @@ import Content from './Content'
 import React, { useState, useEffect, setState } from 'react';
 import { useLocalStorage } from "./LocalStorage";
 
-const APP_VERSION = '1.0.0'
+const APP_VERSION = '1-0'
 
 
 function App() {
@@ -24,11 +24,10 @@ function App() {
     setSettings(settings)
   }
   function saveSettings(settings){
-    console.log(settings)
     var a = document.getElementById("saveButton");
     var file = new Blob([JSON.stringify(settings)], {type: 'json'});
     a.href = URL.createObjectURL(file);
-    a.download = settings.name+APP_VERSION;
+    a.download = settings.name+'v'+APP_VERSION;
   }
   function closeSettings(settings){
     setSettingsVisible(false)
@@ -45,7 +44,6 @@ function App() {
     fileReader.readAsText(file)
     fileReader.onload = () => {
       var settings = JSON.parse(fileReader.result)
-      console.log("settings",settings)
       setSettings(settings);
     }
 
