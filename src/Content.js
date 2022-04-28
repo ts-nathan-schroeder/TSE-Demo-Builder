@@ -84,7 +84,7 @@ document.documentElement.style.setProperty('--secondary-color', settings.seconda
 
 var renderPage = <div>Select a Link!</div>
 if (renderType=='Search'){
-  renderPage = <SearchEmbed hideDataSources={true} frameParams={{width:'100%',height:'100vh'}}
+  renderPage = <SearchEmbed dataSources={renderContent.split(",")} hideDataSources={true} frameParams={{width:'100%',height:'100vh'}}
   />
 }
 if (renderType=='Liveboard'){
@@ -99,7 +99,7 @@ if (renderType=='App'){
 
 }
 if (renderType=='URL'){
-  renderPage = <iframe primaryNavHidden="true" embedApp="true" style={{width:'100%',height:'100%',border:'none'}} src={renderContent}></iframe>
+  renderPage = <iframe  style={{width:'100%',height:'100%',border:'none'}} src={renderContent}></iframe>
 }
 
 const logoImageHolder = {
