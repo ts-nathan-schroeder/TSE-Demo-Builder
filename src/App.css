@@ -49,20 +49,15 @@
   width:100%;
   height:100vh;
 }
-#container{
-  display:flex;
-  flex-direction: row;
-  width: 100%;
-  height: 100vh;
-}
+
 body{
   height:100vh;
 }
-.logoImage{
-  height:75px;
-  width:75px;
+.logoImagePreview{
+  width:70px;
+  height:70px;
 }
-.logoImage:hover{
+.logoImagePreview:hover{
   cursor:pointer;
 }
 .settingLabel{
@@ -70,11 +65,8 @@ body{
   margin-bottom:5px;
 }
 .contentLink{
-  height:30px;
   font-size:14px;
   font-family: 'Open Sans', sans-serif;
-  padding-left:15px;
-  padding-top: 10px;
 }
 .contentLink:hover{
   cursor: pointer;
@@ -146,10 +138,6 @@ body{
 .hoverMenu {
   font-weight: 300;
   text-transform: none;
-  position: absolute;
-  width: 150px;
-  left: 150px;
-  margin-top:-29px;
   background: var(--secondary-color);
   color: var(--primary-color);
   box-shadow: 0 5 5 #ccc;

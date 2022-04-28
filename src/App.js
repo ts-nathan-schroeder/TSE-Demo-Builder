@@ -19,9 +19,10 @@ const APP_VERSION = '1-0'
 function App() {
   const [settings, setSettings] = useLocalStorage("settings", "");
   const [settingsVisible, setSettingsVisible] = useState('')
-
+  const [timeKey, setTimeKey] = useState('')
   function applySettings(settings){
     setSettings(settings)
+    setTimeKey(Date.now());
   }
   function saveSettings(settings){
     var a = document.getElementById("saveButton");
@@ -37,7 +38,7 @@ function App() {
   }
   function newSettings(){
     setSettings({});
-    setSettingsVisible(true);
+    setTimeKey(Date.now());
   }
   const openSettings = (file) => {
     const fileReader = new FileReader();
@@ -45,6 +46,7 @@ function App() {
     fileReader.onload = () => {
       var settings = JSON.parse(fileReader.result)
       setSettings(settings);
+      setTimeKey(Date.now());
     }
 
   }  
@@ -55,7 +57,7 @@ function App() {
     top:50,
     left:300,
     width:'600px',
-    height:'600px',
+    height:'700px',
     background:'#ffffff',
     boxShadow: '0px 0px 250px #ededed',
     padding:'25px'
@@ -64,7 +66,7 @@ function App() {
     <div>
       <Content settings={settings} showSettings={showSettings} newSettings={newSettings}/>
       { settingsVisible ? <div style={ popover }>
-      <Settings openSettings={openSettings} applySettings={applySettings} saveSettings={saveSettings} settings={settings} closeSettings={closeSettings} key={settings}/>  
+      <Settings openSettings={openSettings} applySettings={applySettings} saveSettings={saveSettings} settings={settings} closeSettings={closeSettings} newSettings={newSettings} key={timeKey} />  
       </div> : null }
           
     </div>

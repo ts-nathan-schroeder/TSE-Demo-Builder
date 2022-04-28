@@ -10,6 +10,7 @@ const {
   saveSettings,
   closeSettings,
   openSettings,
+  newSettings,
   settings
 } = props
 
@@ -109,6 +110,12 @@ const cover = {
 if (!links){
   setLinks([])
 }else{
+  var activeMenus = []
+  for (var link of links){
+    if (linkTypes[link]=='Menu'){
+      activeMenus.push(linkNames[link])
+    }
+  }
   var linkObjs   = links.map(link => (
     <Link
       key={link}
@@ -121,7 +128,7 @@ if (!links){
       type={linkTypes[link]}
       content={linkContents[link]}
       parent={linkParents[link]}
-      linkNames={linkNames}
+      linkNames={activeMenus}
     />
   ));
 } 
@@ -163,6 +170,10 @@ return (
         Apply
       </div>
       <div className='close'>
+        <div  className="button" onClick={newSettings} >
+          <TrashIcon />
+          Clear
+        </div>
         <div className="button" onClick={triggerInputFile} >
           <OpenIcon />
           Open
@@ -195,7 +206,7 @@ return (
     <div className="horizontalMenu">
       <div className="verticalMenu">
         <div className="settingLabel">Logo Image</div> 
-        <img className="logoImage" onClick={triggerInputImage} src={logoImage}></img> 
+        <img className="logoImagePreview" onClick={triggerInputImage} src={logoImage}></img> 
       </div>
       <div className="verticalMenu">
         <input ref={imageInput} type="file" name="file" 
@@ -227,8 +238,8 @@ return (
       <div className="verticalMenu">
         <div className="settingLabel">Orientation</div> 
         <select onChange={e => setOrientation(e.target.value)} value={orientation}> 
-            <option value="Horizontal">Horizontal</option>
             <option value="Vertical">Vertical</option>
+            <option value="Horizontal">Horizontal</option>
         </select>
       </div>
     </div>
@@ -322,5 +333,8 @@ function SaveIcon(){
 }
 function PlusIcon(){
   return <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24" width="24" fill="currentColor"><path d="M4 2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H4zm0-2h12a4 4 0 0 1 4 4v12a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V4a4 4 0 0 1 4-4zm7 11v4a1 1 0 0 1-2 0v-4H5a1 1 0 0 1 0-2h4V5a1 1 0 1 1 2 0v4h4a1 1 0 0 1 0 2h-4z"></path></svg>;
+}
+function TrashIcon(){
+  return <svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -2 24 24" width="24" fill="currentColor"><path d="M6 2V1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1h4a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-.133l-.68 10.2a3 3 0 0 1-2.993 2.8H5.826a3 3 0 0 1-2.993-2.796L2.137 7H2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h4zm10 2H2v1h14V4zM4.141 7l.687 10.068a1 1 0 0 0 .998.932h6.368a1 1 0 0 0 .998-.934L13.862 7h-9.72zM7 8a1 1 0 0 1 1 1v7a1 1 0 0 1-2 0V9a1 1 0 0 1 1-1zm4 0a1 1 0 0 1 1 1v7a1 1 0 0 1-2 0V9a1 1 0 0 1 1-1z"></path></svg>
 }
 export default SettingsMenu;
