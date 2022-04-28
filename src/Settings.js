@@ -288,6 +288,14 @@ function Link(props){
   var contentInput = null;
   if (type=='Menu'){
     contentInput = null;
+  }else if (type=='App'){
+    contentInput = <select style={{width:'250px',marginRight:'5px'}} onChange={e => handleContentChange(e.target.value)} value={content}> 
+      <option value="home">Home</option>
+      <option value="answers">Answers</option>
+      <option value="pinboards">Pinboards</option>
+      <option value="data/tables">Data</option>
+   
+    </select>
   }
   else if (type=="None"){
     contentInput = null;
@@ -308,14 +316,18 @@ function Link(props){
         <option value="Search">Search</option>
         <option value="Liveboard">Liveboard</option>
         <option value="Answer">Answer</option>
+        <option value="App">App</option>
         <option value="URL">URL</option>
         <option value="Menu">Menu</option>
       </select>
       {contentInput}
-      <select style={{width:'80px',marginRight:'5px'}} onChange={e => handleParentChange(e.target.value)} value={parent}> 
-        <option value="None">None</option>
-        {parentOptions}
-      </select>
+      {(type!='Menu') ? 
+        <select style={{width:'80px',marginRight:'5px'}} onChange={e => handleParentChange(e.target.value)} value={parent}> 
+          <option value="None">None</option>
+          {parentOptions}
+        </select>     
+      : null }
+
       </div>
   )
 }

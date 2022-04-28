@@ -94,7 +94,7 @@ if (renderType=='Answer'){
   />
 }
 if (renderType=='App'){
-  renderPage = <AppEmbed pageId={Page.Data}  frameParams={{width:'100%',height:'100vh'}} />
+  renderPage = <AppEmbed pageId={renderContent}  frameParams={{width:'100%',height:'100vh'}} />
 }
 if (renderType=='URL'){
   renderPage = <iframe  style={{width:'100%',height:'100%',border:'none'}} src={renderContent}></iframe>
@@ -275,7 +275,7 @@ const contentLinkHorizontal = {
   alignItems: 'center',
   flexShrink:0,
   paddingLeft:'10px',
-  paddingRight:'10px',
+  paddingRight:'25px',
 }
 const horizontalLink = {
   display:'flex',
