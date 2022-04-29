@@ -27,7 +27,15 @@ This will open the configuration menu.
 
 ### Step 3: Customize your Demo
 
-Provide the required fields: \
+Adjust Colors, add a logo, add navigation links. See configuration details below. Note you will need to enable CORS allowed origins on your thoughtspot instance for localhost:3000
+
+### Step 4: Save for re-use
+
+The settings supplied here can be saved and reloaded. Clicking save will download a text file containing the configuration JSON. This can then be re-loaded with "open"
+
+
+### Configuration options
+
 | Setting | Description |
 | ------------- | ------------- |
 | Settings Name | This is the name of your configuration settings. When you click save, the file will be saved with this name, allowing for re-use. |
@@ -39,9 +47,9 @@ Provide the required fields: \
 | Links | This is the content that will show up in the nav menu. See Link Configuration for more info. |
 
 ### Link Configuration
-#### Link Name
+##### Link Name
 This is what will be displayed in the nav menu
-#### Link Type
+##### Link Type
 | Link Type | Description & Configuration |
 | ------------- | ------------- |
 | None | empty link that does nothing on click |
@@ -52,7 +60,7 @@ This is what will be displayed in the nav menu
 | URL | This will embed a webpage within an Iframe. The configuration space accepts any URL. Good for specifying a home page that is the client's actual website. |
 | App | This will embed the thoughtspot application, landing on the page specified in the configuration panel (Home, Liveboards, Answers). |
 
-#### Link Conifugration Space 
+##### Link Conifugration Space 
 This is used to provide additional details needed to render the link. See Link Type descriptions above for more information on each option.
 ##### Link Parent
 This is used to embed links within menus. First create a Menu Type link and provide a name. Any link that you want to show up within that menu, you will want to set that link's parent attribute to be the menu's name.
