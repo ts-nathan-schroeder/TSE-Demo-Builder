@@ -52,12 +52,12 @@ This is what will be displayed in the nav menu
 ##### Link Type
 | Link Type | Description | Configuration |
 | ------------- | ------------- | ------------- |
-| None | empty link that does nothing on click | None |
-| Search | TS Search embed. | The configuration space accepts a list of datasources GUIDs comma delimited |
-| Answer | TS Search embed, with a default answer. | The configuration space accepts an answer GUID |
-| Liveboard | TS Liveboard embed. | The configuration space accepts a liveboard GUID. |
+| None | Empty link that does nothing on click | None |
+| Search | TS Search embed. | List of datasources GUIDs comma delimited |
+| Answer | TS Search embed, with a default answer. | Answer GUID |
+| Liveboard | TS Liveboard embed. | Liveboard GUID. |
 | Menu | This link will expose a sub-menu on hover. Contents of this menu will be determined by the parent dropdown. | None |
-| URL | This will embed a webpage within an Iframe. The configuration space accepts any URL. Good for specifying a home page that is the client's actual website. |
+| URL | This will embed a webpage within an Iframe. The configuration space accepts any URL. Good for specifying a home page that is the client's actual website. | Full URL |
 | App | This will embed the thoughtspot application, landing on the page specified in the configuration panel. | Home, Liveboards, Answers |
 
 ##### Link Conifugration Space 
