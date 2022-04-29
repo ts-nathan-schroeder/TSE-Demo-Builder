@@ -9,14 +9,16 @@ This application is designed to enable quick TSE demos that mimic a client envir
 
 ### Step 1: Installation
 
-Install Node JS [https://nodejs.org/en/download/][https://nodejs.org/en/download/] \
-This app uses version 16 \
+Install Node JS [https://nodejs.org/en/download/]. This app uses version 16.
 
-Clone the repository. In a command line type: \
-`git clone https://github.com/hannsta/TSE-Demo-Builder.git`
+`git clone https://github.com/hannsta/TSE-Demo-Builder.git` 
+Clones the repository. 
 
-`npm start`
-Runs the app in the development mode.\
+`npm install`
+Installs Node Modules. This will only need to be done once on installation. 
+
+`npm start` 
+Runs the app in the development mode.
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 ### Step 2: Click the Gear Icon
@@ -42,12 +44,13 @@ This is what will be displayed in the nav menu
 #### Link Type
 | Link Type | Description & Configuration |
 | ------------- | ------------- |
-| None | empty link that does nothing on click
+| None | empty link that does nothing on click |
 | Search | TS Search embed. The configuration space accepts a list of datasources comma delimited |
 | Answer | TS Search embed, with a default answer. The configuration space accepts an answer GUID |
 | Liveboard | TS Liveboard embed. The configuration space accepts a liveboard GUID. |
 | Menu | This link will expose a sub-menu on hover. Contents of this menu will be determined by the parent dropdown. |
 | URL | This will embed a webpage within an Iframe. The configuration space accepts any URL. Good for specifying a home page that is the client's actual website. |
+| App | This will embed the thoughtspot application, landing on the page specified in the configuration panel (Home, Liveboards, Answers). |
 
 #### Link Conifugration Space 
 This is used to provide additional details needed to render the link. See Link Type descriptions above for more information on each option.

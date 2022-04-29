@@ -52,11 +52,41 @@ const handleLinkParentChange = (linkId, value) => {
   setLinkParents({ ...linkParents, [linkId]: value });
 };
 const addLink = () =>{
-  setLinks([...links, links.length])
-  setLinkNames({ ...linkNames, [links.length]: undefined });
-  setLinkContents({ ...linkContents, [links.length]: undefined });
-  setLinkParents({ ...linkParents, [links.length]: undefined });
-  setLinkTypes({ ...linkTypes, [links.length]: undefined });
+  var uuid = uuidv4()
+  setLinks([...links, uuid])
+  setLinkNames({ ...linkNames, [uuid]: undefined });
+  setLinkContents({ ...linkContents, [uuid]: undefined });
+  setLinkParents({ ...linkParents, [uuid]: undefined });
+  setLinkTypes({ ...linkTypes, [uuid]: undefined });
+}
+const removeLink = (id) =>{
+  setLinks(links.filter((e)=>(e !== id)))
+  setLinkNames({ ...linkNames, [id]: undefined });
+  setLinkContents({ ...linkContents, [id]: undefined });
+  setLinkParents({ ...linkParents, [id]: undefined });
+  setLinkTypes({ ...linkTypes, [id]: undefined });
+}
+const moveUp = (id) => {
+  var linkCopy = [... links]
+  var currIndex = links.indexOf(id)
+  if (currIndex>0){
+    var newIndex = currIndex - 1;
+    var replacement = links[newIndex];
+    linkCopy[newIndex] = id
+    linkCopy[currIndex] = replacement
+    setLinks(linkCopy)
+  }
+}
+const moveDown = (id) => {
+  var linkCopy = [... links]
+  var currIndex = links.indexOf(id)
+  if (currIndex<links.length-1){
+    var newIndex = currIndex + 1;
+    var replacement = links[newIndex];
+    linkCopy[newIndex] = id
+    linkCopy[currIndex] = replacement
+    setLinks(linkCopy)
+  }
 }
 const getSettingsObj = () =>{
   var settings = {
@@ -129,6 +159,9 @@ if (!links){
       content={linkContents[link]}
       parent={linkParents[link]}
       linkNames={activeMenus}
+      removeLink={removeLink}
+      moveDown={moveDown}
+      moveUp={moveUp}
     />
   ));
 } 
@@ -247,6 +280,9 @@ return (
 
     <div className="settingLabel">Links</div> 
     <div className="linkContainer">
+      <div className='linkHeader'>
+        <div style={{width:'110px'}}>Name</div><div style={{width:'90px'}}>Type</div><div style={{width:'240px'}}>Configuration</div><div>Parent</div>
+      </div>
       {linkObjs}
     </div>
     <div className="button" onClick={addLink}>
@@ -270,7 +306,10 @@ function Link(props){
     saveLinkType,
     saveLinkContent,
     saveLinkParent,
-    linkNames
+    linkNames,
+    removeLink,
+    moveDown,
+    moveUp,
   } = props
 
   function handleNameChange(linkName){
@@ -285,6 +324,7 @@ function Link(props){
   function handleContentChange(linkContent){
     saveLinkContent(id,linkContent)
   }
+  
   var contentInput = null;
   if (type=='Menu'){
     contentInput = null;
@@ -292,7 +332,7 @@ function Link(props){
     contentInput = <select style={{width:'250px',marginRight:'5px'}} onChange={e => handleContentChange(e.target.value)} value={content}> 
       <option value="home">Home</option>
       <option value="answers">Answers</option>
-      <option value="pinboards">Pinboards</option>
+      <option value="pinboards">Liveboards</option>
       <option value="data/tables">Data</option>
    
     </select>
@@ -327,10 +367,25 @@ function Link(props){
           {parentOptions}
         </select>     
       : null }
-
+      <div style={{width:'20px',marginRight:'5px'}} onClick={() => removeLink(id)}>
+        <TrashIcon/>
       </div>
+      <div style={{width:'20px',marginRight:'5px'}} onClick={() => moveUp(id)}>
+        <ArrowUp/>
+      </div>
+      <div style={{width:'20px',marginRight:'5px'}} onClick={() => moveDown(id)}>
+        <ArrowDown/>
+      </div>
+
+     </div>
   )
 }
+function uuidv4() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  );
+}
+
 function CloseIcon(){
   return <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24" width="24" fill="currentColor"><path d="M4 2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H4zm0-2h12a4 4 0 0 1 4 4v12a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V4a4 4 0 0 1 4-4z"></path><path d="M11.414 10l2.829 2.828a1 1 0 0 1-1.415 1.415L10 11.414l-2.828 2.829a1 1 0 1 1-1.415-1.415L8.586 10 5.757 7.172a1 1 0 0 1 1.415-1.415L10 8.586l2.828-2.829a1 1 0 0 1 1.415 1.415L11.414 10z"></path></svg>;
 }
@@ -348,5 +403,11 @@ function PlusIcon(){
 }
 function TrashIcon(){
   return <svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -2 24 24" width="24" fill="currentColor"><path d="M6 2V1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1h4a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-.133l-.68 10.2a3 3 0 0 1-2.993 2.8H5.826a3 3 0 0 1-2.993-2.796L2.137 7H2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h4zm10 2H2v1h14V4zM4.141 7l.687 10.068a1 1 0 0 0 .998.932h6.368a1 1 0 0 0 .998-.934L13.862 7h-9.72zM7 8a1 1 0 0 1 1 1v7a1 1 0 0 1-2 0V9a1 1 0 0 1 1-1zm4 0a1 1 0 0 1 1 1v7a1 1 0 0 1-2 0V9a1 1 0 0 1 1-1z"></path></svg>
+}
+function ArrowDown(){
+  return <svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -4.5 24 24" width="24" fill="currentColor"><path d="M8 11.243l3.95-3.95a1 1 0 1 1 1.414 1.414l-5.657 5.657a.997.997 0 0 1-1.414 0L.636 8.707A1 1 0 1 1 2.05 7.293L6 11.243V1.657a1 1 0 1 1 2 0v9.586z"></path></svg>;
+}
+function ArrowUp(){
+  return <svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -4.5 24 24" width="24" fill="currentColor"><path d="M6 4.071l-3.95 3.95A1 1 0 0 1 .636 6.607L6.293.95a.997.997 0 0 1 1.414 0l5.657 5.657A1 1 0 0 1 11.95 8.02L8 4.07v9.586a1 1 0 1 1-2 0V4.07z"></path></svg>
 }
 export default SettingsMenu;
