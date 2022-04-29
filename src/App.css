@@ -151,7 +151,7 @@ body{
   text-transform: none;
   background: var(--secondary-color);
   color: var(--primary-color);
-  box-shadow: 0 5 5 #ccc;
+  box-shadow: 15px 7px 25px #ededed;
 }
 .nav__submenu-item:hover {
   background: rgba(#000, 0.1);
