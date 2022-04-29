@@ -51,7 +51,7 @@ The settings supplied here can be saved and reloaded. Clicking save will downloa
 This is what will be displayed in the nav menu
 ##### Link Type
 | Link Type | Description | Configuration |
-| ------------- | ------------- |
+| ------------- | ------------- | ------------- |
 | None | empty link that does nothing on click | None |
 | Search | TS Search embed. | The configuration space accepts a list of datasources GUIDs comma delimited |
 | Answer | TS Search embed, with a default answer. | The configuration space accepts an answer GUID |
