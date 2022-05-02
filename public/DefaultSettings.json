@@ -12,7 +12,6 @@
        "8120dd34-0c1d-4a9c-9482-f67a97265c10",
        "7645a0f8-cccd-43bc-ad3c-7d21f586457d",
        6,
-       "5166b2e0-3412-4df3-8e28-73e632cd551a",
        "654fb368-08d1-49a9-bbf9-7ca6a9c892a6"
     ],
     "linkTypes":{
@@ -26,8 +25,7 @@
        "87391656-44cc-4d3f-ab60-ad5d95119bec":"Search",
        "8120dd34-0c1d-4a9c-9482-f67a97265c10":"App",
        "7645a0f8-cccd-43bc-ad3c-7d21f586457d":"URL",
-       "654fb368-08d1-49a9-bbf9-7ca6a9c892a6":"URL",
-       "5166b2e0-3412-4df3-8e28-73e632cd551a":"URL"
+       "654fb368-08d1-49a9-bbf9-7ca6a9c892a6":"URL"
     },
     "linkNames":{
        "0":"Home",
@@ -40,8 +38,7 @@
        "87391656-44cc-4d3f-ab60-ad5d95119bec":"Search Data",
        "8120dd34-0c1d-4a9c-9482-f67a97265c10":"SpotIQ",
        "7645a0f8-cccd-43bc-ad3c-7d21f586457d":"Monitor",
-       "654fb368-08d1-49a9-bbf9-7ca6a9c892a6":"Admin",
-       "5166b2e0-3412-4df3-8e28-73e632cd551a":"Developer"
+       "654fb368-08d1-49a9-bbf9-7ca6a9c892a6":"Admin"
     },
     "linkContents":{
        "0":"home",
@@ -50,8 +47,7 @@
        "6":"data",
        "8120dd34-0c1d-4a9c-9482-f67a97265c10":"spotiq",
        "7645a0f8-cccd-43bc-ad3c-7d21f586457d":"https://se-thoughtspot-cloud.thoughtspot.cloud/#/monitor",
-       "654fb368-08d1-49a9-bbf9-7ca6a9c892a6":"https://se-thoughtspot-cloud.thoughtspot.cloud/#/admin",
-       "5166b2e0-3412-4df3-8e28-73e632cd551a":"https://se-thoughtspot-cloud.thoughtspot.cloud/#/develop"
+       "654fb368-08d1-49a9-bbf9-7ca6a9c892a6":"https://se-thoughtspot-cloud.thoughtspot.cloud/#/admin"
     },
     "linkParents":{
        "4":"Answers",
@@ -59,8 +55,7 @@
        "6":"Workbench",
        "8120dd34-0c1d-4a9c-9482-f67a97265c10":"Workbench",
        "7645a0f8-cccd-43bc-ad3c-7d21f586457d":"Workbench",
-       "654fb368-08d1-49a9-bbf9-7ca6a9c892a6":"Workbench",
-       "5166b2e0-3412-4df3-8e28-73e632cd551a":"Workbench"
+       "654fb368-08d1-49a9-bbf9-7ca6a9c892a6":"Workbench"
     },
     "primaryColor":"#a085f1",
     "secondaryColor":"#f3f6fa",

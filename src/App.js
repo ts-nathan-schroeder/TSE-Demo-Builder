@@ -41,10 +41,9 @@ function App() {
     setTimeKey(Date.now());
   }
   function loadDefaults(){
-    console.log("loading defaults")
-
     fetch('DefaultSettings.json').then(response => response.json()).then(data => {
       setSettings(data)
+      setTimeKey(Date.now());
     })
   }
   const openSettings = (file) => {
