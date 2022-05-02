@@ -14,7 +14,7 @@ import React, { useState, useEffect, setState } from 'react';
 import { useLocalStorage } from "./LocalStorage";
 
 const APP_VERSION = '1-0'
-
+let initialLoad = true;
 
 function App() {
   const [settings, setSettings] = useLocalStorage("settings", "");
@@ -40,6 +40,13 @@ function App() {
     setSettings({});
     setTimeKey(Date.now());
   }
+  function loadDefaults(){
+    console.log("loading defaults")
+
+    fetch('DefaultSettings.json').then(response => response.json()).then(data => {
+      setSettings(data)
+    })
+  }
   const openSettings = (file) => {
     const fileReader = new FileReader();
     fileReader.readAsText(file)
@@ -62,11 +69,18 @@ function App() {
     boxShadow: '0px 0px 250px #ededed',
     padding:'25px'
   }
+
+  useEffect(() => {
+    if (initialLoad && !settings){
+      loadDefaults();
+    }
+  }, [])
+  
   return(
     <div>
       <Content settings={settings} showSettings={showSettings} newSettings={newSettings}/>
       { settingsVisible ? <div style={ popover }>
-      <Settings openSettings={openSettings} applySettings={applySettings} saveSettings={saveSettings} settings={settings} closeSettings={closeSettings} newSettings={newSettings} key={timeKey} />  
+      <Settings openSettings={openSettings} applySettings={applySettings} saveSettings={saveSettings} settings={settings} closeSettings={closeSettings} newSettings={newSettings} loadDefaults={loadDefaults} key={timeKey} />  
       </div> : null }
           
     </div>

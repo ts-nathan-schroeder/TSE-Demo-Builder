@@ -11,7 +11,8 @@ const {
   closeSettings,
   openSettings,
   newSettings,
-  settings
+  settings,
+  loadDefaults
 } = props
 
 const fileInput = useRef(null)
@@ -207,6 +208,10 @@ return (
           <TrashIcon />
           Clear
         </div>
+        <div  className="button" onClick={loadDefaults} >
+          <RevertIcon />
+          Default
+        </div>
         <div className="button" onClick={triggerInputFile} >
           <OpenIcon />
           Open
@@ -333,8 +338,8 @@ function Link(props){
       <option value="home">Home</option>
       <option value="answers">Answers</option>
       <option value="pinboards">Liveboards</option>
-      <option value="data/tables">Data</option>
-   
+      <option value="data">Data</option>
+      <option value="spotiq">SpotIQ</option> 
     </select>
   }
   else if (type=="None"){
@@ -356,7 +361,7 @@ function Link(props){
         <option value="Search">Search</option>
         <option value="Liveboard">Liveboard</option>
         <option value="Answer">Answer</option>
-        <option value="App">App</option>
+        <option value="App">Full App</option>
         <option value="URL">URL</option>
         <option value="Menu">Menu</option>
       </select>
@@ -409,5 +414,8 @@ function ArrowDown(){
 }
 function ArrowUp(){
   return <svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -4.5 24 24" width="24" fill="currentColor"><path d="M6 4.071l-3.95 3.95A1 1 0 0 1 .636 6.607L6.293.95a.997.997 0 0 1 1.414 0l5.657 5.657A1 1 0 0 1 11.95 8.02L8 4.07v9.586a1 1 0 1 1-2 0V4.07z"></path></svg>
+}
+function RevertIcon(){
+  return <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24" width="24" fill="currentColor"><path d="M2 5h16V2H2v3zm16 2v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7H1a1 1 0 0 1-1-1V1a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-1zM4 18h12V7H4v11zm4-4h4a1 1 0 0 1 0 2H8a1 1 0 0 1 0-2z"></path></svg>;
 }
 export default SettingsMenu;

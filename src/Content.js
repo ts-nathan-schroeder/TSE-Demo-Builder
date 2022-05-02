@@ -240,19 +240,17 @@ const logoImageHolderHorizontal = {
   marginRight:'150px'
 }
 const verticalLogoImage ={
-  height:'75px',
   width:'75px',
 }
 const horizontalLogoImage ={
   height:'50px',
-  width:'50px',
 }
 const horizontalIcons = {
   display:'flex',
   flexDirection:'column',
   justifyContent:'center', 
   alignItems:'flex-end',
-  width:'100vh',
+  width:'100%',
   marginRight: '15px'
 }
 const verticalIcons = {

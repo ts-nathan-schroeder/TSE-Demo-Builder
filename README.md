@@ -12,14 +12,23 @@ This application is designed to enable quick TSE demos that mimic a client envir
 Install Node JS [https://nodejs.org/en/download/]. This app uses version 16.
 
 `git clone https://github.com/hannsta/TSE-Demo-Builder.git` 
-Clones the repository. 
+Clones the repository. Alternatively, download and extract the zip file.
+
+`cd TSE-Demo-Builder` 
+Navigate the terminal to the application's primary folder
 
 `npm install`
-Installs Node Modules. This will only need to be done once on installation. 
+Installs Node Modules. This will only need to be done once on installation. If you happen to rebase while pulling the latest version you will also need to run this again.
 
 `npm start` 
 Runs the app in the development mode.
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+
+#### Updating to the latest version
+
+`git pull`
+To pull the latest version. If 
+
 
 ### Step 2: Click the Gear Icon
 
@@ -57,7 +66,7 @@ This is what will be displayed in the nav menu
 | Answer | TS Search embed, with a default answer. | Answer GUID |
 | Liveboard | TS Liveboard embed. | Liveboard GUID. |
 | Menu | This link will expose a sub-menu on hover. Contents of this menu will be determined by the parent dropdown. | None |
-| URL | This will embed a webpage within an Iframe. The configuration space accepts any URL. Good for specifying a home page that is the client's actual website. | Full URL |
+| URL | This will embed a webpage within an Iframe. Good for specifying a home page that is the client's actual website. | Full URL |
 | App | This will embed the thoughtspot application, landing on the page specified in the configuration panel. | Home, Liveboards, Answers |
 
 ##### Link Conifugration Space 
