@@ -261,11 +261,12 @@ const verticalIcons = {
   height:'100vh'
 }
 const contentLinkVertical = {
-  height:'30px',
   fontSize:'14px',
   fontFamily: "'Open Sans', sans-serif",
   paddingLeft:'15px',
   paddingTop:'10px',
+  paddingBottom:'10px',
+  marginBottom: '5px'
 }
 const contentLinkHorizontal = {
   height:'50px',
