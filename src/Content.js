@@ -269,6 +269,7 @@ const contentLinkVertical = {
   marginBottom: '5px'
 }
 const contentLinkHorizontal = {
+  maxWidth:'100px',
   height:'50px',
   display:'flex',
   alignItems: 'center',
