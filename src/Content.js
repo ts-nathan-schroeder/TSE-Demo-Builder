@@ -205,7 +205,8 @@ const topMenu = {
   color: 'var(--secondary-color)',
   borderBottom: '1px solid #dddddd',
   width: '100%',
-  height: '80px',
+  height: '75px',
+  minHeight: '75px',
   display: 'flex',
   flexDirection: 'row',
   boxShadow: '0px 0px 15px #dddddd'
