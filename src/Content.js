@@ -111,7 +111,9 @@ function openGit(){
 return (
   <div style={isHorizontal ? horizontalContainer : verticalContainer}>
       <div style={isHorizontal ? topMenu : leftMenu}>
-        <div style={isHorizontal ? logoImageHolderHorizontal: logoImageHolderVertical}><img src={settings.logoImage} style={isHorizontal ? horizontalLogoImage : verticalLogoImage}></img></div>
+        <div style={isHorizontal ? logoImageHolderHorizontal: logoImageHolderVertical}>
+          <img src={settings.logoImage} style={isHorizontal ? horizontalLogoImage : verticalLogoImage}></img>
+        </div>
 
         {linkContainers}
         <div style={isHorizontal ? horizontalIcons : verticalIcons}>
@@ -231,13 +233,11 @@ const logoImageHolderVertical = {
   marginBottom:'20px'
 }
 const logoImageHolderHorizontal = {
-  height: '75px',
-  width: '75px',
   display: 'flex',
   justifyContent: 'center',
   alignItems:'center',
   marginLeft:'20px',
-  marginRight:'150px'
+  marginRight:'100px'
 }
 const verticalLogoImage ={
   width:'75px',
