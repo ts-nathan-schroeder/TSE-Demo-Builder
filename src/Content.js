@@ -1,7 +1,7 @@
 import React, { useState, useEffect, setState } from 'react';
 import { init,  AuthType, Page} from '@thoughtspot/visual-embed-sdk';
 import { SearchEmbed, LiveboardEmbed, AppEmbed } from '@thoughtspot/visual-embed-sdk/react';
-
+import { MultiSelect } from "react-multi-select-component";
 
 function Content(props) {
 const {
@@ -12,7 +12,10 @@ const thoughtspot_URL = "https://se-thoughtspot-cloud.thoughtspot.cloud/#"
 
 const [renderType, setRenderType] = useState('')
 const [renderContent, setRenderContent] = useState('')
-
+const [renderName, setRenderName] = useState('')
+const [runFilters, setRunFilters] = useState('')
+const [selectedFilters, setSelectedFilters] = useState('')
+const [filterKey, setFilterKey] = useState('')
 
 useEffect(() => {
   if (settings.URL){
@@ -26,11 +29,52 @@ useEffect(() => {
       alert("could not connect to thoughtspot")
     }
   }
+  if (!runFilters) setRunFilters([])
+  if (!selectedFilters) setSelectedFilters({})
 }, [])
 
-function renderLink(type,content){
+function renderLink(type,content,name){
   setRenderContent(content);
   setRenderType(type);
+  setRenderName(name);
+}
+
+function setFilter(e){
+  var create = true;
+  var filterVals = []
+  var selectedFilterCopy = selectedFilters;
+
+
+  if (e.length>0){
+
+    var filterName = e[0].value.split("-")[0]
+    for (var i=0;i<e.length;i++){
+      filterVals.push(e[i].label)
+    }
+    if (runFilters){
+      var filtersObj = runFilters
+      for (var i=0;i<filtersObj.length;i++){
+        if (filtersObj[i].columnName==filterName){  
+          filtersObj[i].values=filterVals
+        }
+        create=false;
+      }
+    }
+    if (create){
+      filtersObj = []
+      filtersObj.push({
+        columnName: encodeURIComponent(filterName),
+        operator: 'IN',
+        values: filterVals
+      })
+    }
+    selectedFilterCopy[filterName] = e;
+  }else{
+    selectedFilterCopy =[]
+  }
+  setSelectedFilters(selectedFilterCopy);
+  setRunFilters(filtersObj)
+  setFilterKey(Date.now())
 }
 
 var isHorizontal = (settings.orientation=='Horizontal') 
@@ -72,8 +116,51 @@ if (settings.links){
     />)
   }
 }
+var filters = []
+for (var link of settings.links){
+  if (settings.linkTypes[link]=='Filter' && settings.linkParents[link]==renderName){
+    var filterValues = settings.linkContents[link].split(',')
+    var filterName = settings.linkNames[link]
+    var options = []
+    for (var val in filterValues){
+      options.push({'value':filterName+'-'+filterValues[val],'label':filterValues[val]})
+    }
+    console.log("this filter",selectedFilters)
+    var overrideStrings = {
+      "allItemsAreSelected": "All "+filterName,
+      "search": "Search "+filterName,
+      "selectAll": "Select All",
+      "selectAllFiltered": "Select All (Filtered)",
+      "selectSomeItems": "Select "+filterName,
+      "create": "Create",
+    }
+    if (selectedFilters[filterName]){
+      filters.push(<MultiSelect multi={true} value={selectedFilters[filterName]} options={options} placeholder={"Select "+filterName} onChange={setFilter} overrideStrings={overrideStrings}/>)
+    }else{
+      filters.push(<MultiSelect multi={true} options={options} placeholder={"Select "+filterName} onChange={setFilter} overrideStrings={overrideStrings}/>)
+    }
+    
+  }
+}
+
+//Set primary CSS variables for page
+
 document.documentElement.style.setProperty('--primary-color', settings.primaryColor);
 document.documentElement.style.setProperty('--secondary-color', settings.secondaryColor);
+
+//Style filter dropdown with CSS variables
+if (!isHorizontal){
+  document.documentElement.style.setProperty('--rmsc-p', '8px');
+  document.documentElement.style.setProperty('--rmsc-radius', '3px');
+  document.documentElement.style.setProperty('--rmsc-h', '30px');
+  document.documentElement.style.setProperty('--dropdown-width', '130px');
+  document.documentElement.style.setProperty('--dropdown-padding', '10px');
+}else{
+  document.documentElement.style.setProperty('--rmsc-p', '8px');
+  document.documentElement.style.setProperty('--rmsc-radius', '3px');
+  document.documentElement.style.setProperty('--rmsc-h', '30px');
+  document.documentElement.style.setProperty('--dropdown-width', '150px');
+}
 
 
 var renderPage = <div>Select a Link!</div>
@@ -86,20 +173,40 @@ if (renderType=='Search'){
   />
 }
 if (renderType=='Liveboard'){
-  renderPage = <LiveboardEmbed  hideDataSources={true} liveboardId={renderContent} frameParams={{width:'100%',height:'100vh'}}
+  renderPage = <LiveboardEmbed key={filterKey} hideDataSources={true}  runtimeFilters={runFilters}  liveboardId={renderContent} frameParams={{width:'100%',height:'100vh'}}
   />
 }
 if (renderType=='Answer'){
-  renderPage = <SearchEmbed hideDataSources={true} answerId={renderContent} frameParams={{width:'100%',height:'100vh'}}
+  renderPage = <SearchEmbed hideDataSources={true}  answerId={renderContent} frameParams={{width:'100%',height:'100vh'}}
+  />
+}
+if (renderType=='Search String'){
+
+  var filterString = ""
+  for (var filter of runFilters){
+    var filterVals = filter.values
+    for (var val of filterVals){
+      filterString+=" ["+filter.columnName+"].'"+val+"'"
+    }
+  }
+  //encodeURIComponent(renderContent.split("|")[0]+filterString)
+  console.log("filterString",filterString)
+  var searchOptions = {
+    searchTokenString: 'agent',
+    executeSearch: true,
+  }
+  var dataSources = renderContent.split("|")[1].split(",");
+  
+  console.log("searchOptions",searchOptions,dataSources)
+  renderPage = <SearchEmbed dataSources={dataSources} hideDataSources={true} searchOptions={searchOptions} frameParams={{width:'100%',height:'100vh'}}
   />
 }
 if (renderType=='App'){
-  renderPage = <AppEmbed pageId={renderContent}  frameParams={{width:'100%',height:'100vh'}} />
+  renderPage = <AppEmbed pageId={renderContent} frameParams={{width:'100%',height:'100vh'}} />
 }
 if (renderType=='URL'){
   renderPage = <iframe  style={{width:'100%',height:'100%',border:'none'}} src={renderContent}></iframe>
 }
-
 function openTS(){
   window.open(settings.URL,'_blank')
 }
@@ -114,10 +221,17 @@ return (
         <div style={isHorizontal ? logoImageHolderHorizontal: logoImageHolderVertical}>
           <img src={settings.logoImage} style={isHorizontal ? horizontalLogoImage : verticalLogoImage}></img>
         </div>
-
         {linkContainers}
+
+
         <div style={isHorizontal ? horizontalIcons : verticalIcons}>
+          {!isHorizontal ? <div style={{margin:'10px',}}>
+            {filters}
+          </div> : <div></div>}
           <div style={{display:'flex',flexDirection:'row',alignItems:'center', marginTop:'15px', marginBottom:'10px'}}>
+          {isHorizontal ? <div style={{padding:'10px',}}>
+            {filters}
+          </div> : <div></div>}
             <div onClick={showSettings} style={{marginRight:'5px'}}>
             <SettingsIcon />
             </div>
@@ -151,7 +265,7 @@ function LinkContainer(props){
   const [hoverVisible, setHoverVisible] = useState('')
 
   function handleLinkClick(){
-    renderLink(type, content)
+    renderLink(type, content, name)
   }
   var isDropdown=false;
   if (children){
@@ -238,7 +352,7 @@ const logoImageHolderHorizontal = {
   justifyContent: 'center',
   alignItems:'center',
   marginLeft:'20px',
-  marginRight:'100px'
+  marginRight:'100px',
 }
 const verticalLogoImage ={
   width:'75px',
@@ -293,7 +407,7 @@ const hoverMenuVertical = {
   position: 'absolute',
   width: '150px',
   left: '150px',
-  marginTop:'-34px',
+  marginTop:'-29px',
 }
 function UserIcon(){
   return <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24" width="24" fill="currentColor"><path d="M10 20C4.477 20 0 15.523 0 10S4.477 0 10 0s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm0-14a4 4 0 0 1 4 4v2a4 4 0 1 1-8 0V8a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v2a2 2 0 1 0 4 0V8a2 2 0 0 0-2-2zM5.91 16.876a8.033 8.033 0 0 1-1.58-1.232 5.57 5.57 0 0 1 2.204-1.574 1 1 0 1 1 .733 1.86c-.532.21-.993.538-1.358.946zm8.144.022a3.652 3.652 0 0 0-1.41-.964 1 1 0 1 1 .712-1.868 5.65 5.65 0 0 1 2.284 1.607 8.032 8.032 0 0 1-1.586 1.225z"></path></svg>

@@ -155,7 +155,6 @@ body{
   text-transform: none;
   background: var(--secondary-color);
   color: var(--primary-color);
-  box-shadow: 15px 7px 25px #ededed;
 }
 .nav__submenu-item:hover {
   background: rgba(#000, 0.1);
@@ -163,4 +162,12 @@ body{
 }
 svg:hover{
   cursor:pointer;
+}
+.dropdown-content{
+  color: #666;
+}
+.dropdown-container{
+  width: var(--dropdown-width);
+  margin-right: var(--dropdown-padding);
+  color:#666;
 }

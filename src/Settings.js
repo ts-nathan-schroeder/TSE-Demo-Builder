@@ -147,6 +147,12 @@ if (!links){
       activeMenus.push(linkNames[link])
     }
   }
+  var activeReports = []
+  for (var link of links){
+    if (linkTypes[link]=='Liveboard' || linkTypes[link]=='Search String'){
+      activeReports.push(linkNames[link])
+    }
+  }
   var linkObjs   = links.map(link => (
     <Link
       key={link}
@@ -160,6 +166,7 @@ if (!links){
       content={linkContents[link]}
       parent={linkParents[link]}
       linkNames={activeMenus}
+      activeReports={activeReports}
       removeLink={removeLink}
       moveDown={moveDown}
       moveUp={moveUp}
@@ -312,6 +319,7 @@ function Link(props){
     saveLinkContent,
     saveLinkParent,
     linkNames,
+    activeReports,
     removeLink,
     moveDown,
     moveUp,
@@ -349,10 +357,13 @@ function Link(props){
   }
 
   var parentOptions = []
-  for (var link of Object.values(linkNames)){
+  var parentOptionLinks = linkNames
+  if (type=='Filter'){
+    parentOptionLinks = activeReports;
+  }
+  for (var link of Object.values(parentOptionLinks)){
     parentOptions.push(<option value={link}>{link}</option>)
   }
-
   return(
     <div className="link">
       <input style={{width:'100px',marginRight:'5px'}} value={name} onChange={e => handleNameChange(e.target.value)} />
@@ -364,6 +375,8 @@ function Link(props){
         <option value="App">Full App</option>
         <option value="URL">URL</option>
         <option value="Menu">Menu</option>
+        <option value="Filter">Filter</option>
+        <option value="Search String">Search String</option>
       </select>
       {contentInput}
       {(type!='Menu') ? 
