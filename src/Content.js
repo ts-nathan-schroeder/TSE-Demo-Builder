@@ -189,10 +189,9 @@ if (renderType=='Search String'){
       filterString+=" ["+filter.columnName+"].'"+val+"'"
     }
   }
-  //encodeURIComponent(renderContent.split("|")[0]+filterString)
   console.log("filterString",filterString)
   var searchOptions = {
-    searchTokenString: 'agent',
+    searchTokenString: renderContent.split("|")[0]+filterString,
     executeSearch: true,
   }
   var dataSources = renderContent.split("|")[1].split(",");
