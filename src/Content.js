@@ -44,7 +44,7 @@ function setFilter(e){
   var filterVals = []
   var selectedFilterCopy = selectedFilters;
 
-
+  console.log("setting filters",e)
   if (e.length>0){
 
     var filterName = e[0].value.split("-")[0]
@@ -131,7 +131,7 @@ for (var link of settings.links){
       "search": "Search "+filterName,
       "selectAll": "Select All",
       "selectAllFiltered": "Select All (Filtered)",
-      "selectSomeItems": "Select "+filterName,
+      "selectSomeItems": filterName,
       "create": "Create",
     }
     if (selectedFilters[filterName]){
@@ -154,12 +154,23 @@ if (!isHorizontal){
   document.documentElement.style.setProperty('--rmsc-radius', '3px');
   document.documentElement.style.setProperty('--rmsc-h', '30px');
   document.documentElement.style.setProperty('--dropdown-width', '130px');
-  document.documentElement.style.setProperty('--dropdown-padding', '10px');
+  document.documentElement.style.setProperty('--dropdown-container-right-margin', '0px');
+  document.documentElement.style.setProperty('--dropdown-container-bottom-margin', '10px');
+  document.documentElement.style.setProperty('--dropdown-left-margin', '130px');
+  document.documentElement.style.setProperty('--dropdown-top-margin', '-240px');
+  document.documentElement.style.setProperty('--dropdown-max-height', '240px');
+
 }else{
   document.documentElement.style.setProperty('--rmsc-p', '8px');
   document.documentElement.style.setProperty('--rmsc-radius', '3px');
   document.documentElement.style.setProperty('--rmsc-h', '30px');
   document.documentElement.style.setProperty('--dropdown-width', '150px');
+  document.documentElement.style.setProperty('--dropdown-container-right-margin', '10px');
+  document.documentElement.style.setProperty('--dropdown-container-bottom-margin', '0px');
+  document.documentElement.style.setProperty('--dropdown-left-margin', '0px');
+  document.documentElement.style.setProperty('--dropdown-top-margin', '0px');
+  document.documentElement.style.setProperty('--dropdown-max-height', '500px');
+
 }
 
 
@@ -183,10 +194,12 @@ if (renderType=='Answer'){
 if (renderType=='Search String'){
 
   var filterString = ""
-  for (var filter of runFilters){
-    var filterVals = filter.values
-    for (var val of filterVals){
-      filterString+=" ["+filter.columnName+"].'"+val+"'"
+  if (runFilters){
+    for (var filter of runFilters){
+      var filterVals = filter.values
+      for (var val of filterVals){
+        filterString+=" ["+filter.columnName+"].'"+val+"'"
+      }
     }
   }
   console.log("filterString",filterString)
@@ -220,15 +233,14 @@ return (
         <div style={isHorizontal ? logoImageHolderHorizontal: logoImageHolderVertical}>
           <img src={settings.logoImage} style={isHorizontal ? horizontalLogoImage : verticalLogoImage}></img>
         </div>
+
         {linkContainers}
-
-
         <div style={isHorizontal ? horizontalIcons : verticalIcons}>
           {!isHorizontal ? <div style={{margin:'10px',}}>
-            {filters}
-          </div> : <div></div>}
+              {filters}
+            </div> : <div></div>}
           <div style={{display:'flex',flexDirection:'row',alignItems:'center', marginTop:'15px', marginBottom:'10px'}}>
-          {isHorizontal ? <div style={{padding:'10px',}}>
+          {isHorizontal ? <div style={{display:'flex',flexDirection:'row',padding:'10px',}}>
             {filters}
           </div> : <div></div>}
             <div onClick={showSettings} style={{marginRight:'5px'}}>

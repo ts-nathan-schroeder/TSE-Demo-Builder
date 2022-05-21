@@ -165,9 +165,18 @@ svg:hover{
 }
 .dropdown-content{
   color: #666;
+  position: absolute;
+  margin-top: var(--dropdown-top-margin);
+  margin-left: var(--dropdown-left-margin);
+  max-height: 150px;
+  width:200px !important;
+}
+.select-panel, .options{
+  max-height: var(--dropdown-max-height) !important;
 }
 .dropdown-container{
   width: var(--dropdown-width);
-  margin-right: var(--dropdown-padding);
+  margin-right: var(--dropdown-container-right-margin);
   color:#666;
+  margin-bottom: var(--dropdown-container-bottom-margin);
 }
