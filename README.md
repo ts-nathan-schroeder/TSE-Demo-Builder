@@ -72,7 +72,7 @@ This is what will be displayed in the nav menu
 | URL | This will embed a webpage within an Iframe. Good for specifying a home page that is the client's actual website, but may not work on secure sites. Upload an image of the website to something like dropbox and use this as a link to that. | Full URL |
 | Full App | This will embed the thoughtspot application, landing on the page specified in the configuration panel. | Home, Liveboards, Answers, SpotIQ,  Data |
 | Filter| This attaches a custom filter to a Liveboard or Search String embed, that can be used to supply runtime filter values.  | The Name of the filter should be your column name. The configuration section contains a comma seperated list of possible values for that filter |
-| Search String | This will render a search embed, | The first part contains the string itself. The second part contains the ID of a datasource. These need to be seperated by a vertical bar. |
+| Search String | This will render a search embed with a specific search string. | The first part contains the string itself. The second part contains the ID of a datasource. These need to be seperated by a vertical bar. |
 
 ##### Link Conifugration Space 
 This is used to provide additional details needed to render the link. See Link Type descriptions above for more information on each option.
