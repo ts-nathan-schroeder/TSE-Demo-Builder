@@ -58,7 +58,7 @@ const addLink = () =>{
   setLinkNames({ ...linkNames, [uuid]: undefined });
   setLinkContents({ ...linkContents, [uuid]: undefined });
   setLinkParents({ ...linkParents, [uuid]: undefined });
-  setLinkTypes({ ...linkTypes, [uuid]: undefined });
+  setLinkTypes({ ...linkTypes, [uuid]: 'None' });
 }
 const removeLink = (id) =>{
   setLinks(links.filter((e)=>(e !== id)))
@@ -353,7 +353,15 @@ function Link(props){
   else if (type=="None"){
     contentInput = null;
   }else{
-    contentInput = <input style={{width:'250px',marginRight:'5px'}} value={content} onChange={e => handleContentChange(e.target.value)} />;
+    var placeholders = {
+      'Search': 'GUID of Worksheet',
+      'Liveboard':'GUID of Liveboard',
+      'Answer': 'GUID of Answer',
+      'Filter':'Comma seperated list of filter values',
+      'Search String':'[tml] [search] [query] |WorksheetGUID',
+      'URL':'URL of website or image'
+    }
+    contentInput = <input style={{width:'250px',marginRight:'5px'}} placeholder={placeholders[type]} value={content} onChange={e => handleContentChange(e.target.value)} />;
   }
 
   var parentOptions = []
@@ -364,9 +372,20 @@ function Link(props){
   for (var link of Object.values(parentOptionLinks)){
     parentOptions.push(<option value={link}>{link}</option>)
   }
+  var namePlaceholders = {
+    'Search': 'Link Name',
+    'Liveboard': 'Link Name',
+    'Answer': 'Link Name',
+    'Filter': 'Column Name',
+    'Search String':'Link Name',
+    'URL':'Link Name',
+    'App': 'Link Name',
+    'Menu': 'Menu Name',
+    'None':'Link Name'
+  }
   return(
     <div className="link">
-      <input style={{width:'100px',marginRight:'5px'}} value={name} onChange={e => handleNameChange(e.target.value)} />
+      <input placeholder={namePlaceholders[type]} style={{width:'100px',marginRight:'5px'}} value={name} onChange={e => handleNameChange(e.target.value)} />
       <select style={{width:'80px',marginRight:'5px'}} onChange={e => handleTypeChange(e.target.value)} value={type}> 
         <option value="None">None</option>
         <option value="Search">Search</option>

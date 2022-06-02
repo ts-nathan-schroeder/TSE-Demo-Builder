@@ -1,6 +1,6 @@
 import React, { useState, useEffect, setState } from 'react';
-import { init,  AuthType, Page} from '@thoughtspot/visual-embed-sdk';
-import { SearchEmbed, LiveboardEmbed, AppEmbed } from '@thoughtspot/visual-embed-sdk/react';
+import { init,  AuthType, Page, EmbedEvent} from '@thoughtspot/visual-embed-sdk';
+import { SearchEmbed, LiveboardEmbed, AppEmbed, useEmbedRef } from '@thoughtspot/visual-embed-sdk/react';
 import { MultiSelect } from "react-multi-select-component";
 
 function Content(props) {
@@ -16,6 +16,9 @@ const [renderName, setRenderName] = useState('')
 const [runFilters, setRunFilters] = useState('')
 const [selectedFilters, setSelectedFilters] = useState('')
 const [filterKey, setFilterKey] = useState('')
+const [renderKey, setRenderKey] = useState('')
+
+const embedRef = useEmbedRef();
 
 useEffect(() => {
   if (settings.URL){
@@ -29,14 +32,37 @@ useEffect(() => {
       alert("could not connect to thoughtspot")
     }
   }
-  if (!runFilters) setRunFilters([])
-  if (!selectedFilters) setSelectedFilters({})
+  if (settings.links){
+    filterVals = []
+    var defaultsFound = false;
+    for (var link of settings.links){
+      if (settings.linkTypes[link]=='Filter'){
+        var filterContent = settings.linkContents[link].split("|")
+        var filterName = settings.linkNames[link]
+        if (filterContent.length>1){
+          for (var i=1;i<filterContent.length;i++){
+            var prop = filterContent[i].split("=")[0]
+            var val  = filterContent[i].split("=")[1]
+            if (prop=='default'){
+              console.log("setting default filter",{'value':filterName+'-'+val,'label':val})
+              setFilter([{'value':filterName+'-'+val,'label':val}]);
+              defaultsFound=true;
+            }
+          }
+        }
+      }
+    }
+  }
+  if (!runFilters && !defaultsFound) setRunFilters([])
+  if (!selectedFilters && !defaultsFound)  setSelectedFilters({})
 }, [])
 
 function renderLink(type,content,name){
   setRenderContent(content);
   setRenderType(type);
   setRenderName(name);
+  setRenderKey(Date.now())
+
 }
 
 function setFilter(e){
@@ -44,9 +70,10 @@ function setFilter(e){
   var filterVals = []
   var selectedFilterCopy = selectedFilters;
 
-  console.log("setting filters",e)
+  if (!selectedFilters || selectedFilters.length==0){
+    selectedFilterCopy={};
+  }
   if (e.length>0){
-
     var filterName = e[0].value.split("-")[0]
     for (var i=0;i<e.length;i++){
       filterVals.push(e[i].label)
@@ -72,11 +99,25 @@ function setFilter(e){
   }else{
     selectedFilterCopy =[]
   }
+
+
+
   setSelectedFilters(selectedFilterCopy);
   setRunFilters(filtersObj)
   setFilterKey(Date.now())
 }
-
+function onSearchRendered(){
+  embedRef.current.on(EmbedEvent.CustomAction, (payload) => {
+    console.log(payload)
+    
+    var data = payload.data.embedAnswerData.data[0].columnDataLite
+    var alertString = "Action Triggered: "+ payload.data.id
+    for (var col in data){
+      alertString+= "\n\n"+data[col].dataValue.join(", ")
+    }
+    alert(alertString);
+  })
+}
 var isHorizontal = (settings.orientation=='Horizontal') 
 
 if (settings.links){
@@ -119,13 +160,31 @@ if (settings.links){
 var filters = []
 for (var link of settings.links){
   if (settings.linkTypes[link]=='Filter' && settings.linkParents[link]==renderName){
-    var filterValues = settings.linkContents[link].split(',')
+    var filterContent = settings.linkContents[link].split("|")
+    
+    var  hasSelectAll = true;
+    var defaultValue = '';
+  
+    var filterValues = filterContent[0].split(',')
     var filterName = settings.linkNames[link]
+
+    if (filterContent.length>1){
+      for (var i=1;i<filterContent.length;i++){
+        var prop = filterContent[i].split("=")[0]
+        var val  = filterContent[i].split("=")[1]
+        if (prop=='selectAll'){
+          if (val=='false'){
+            hasSelectAll=false;  
+          }
+        }
+      }
+    }
+
     var options = []
     for (var val in filterValues){
       options.push({'value':filterName+'-'+filterValues[val],'label':filterValues[val]})
     }
-    console.log("this filter",selectedFilters)
+    
     var overrideStrings = {
       "allItemsAreSelected": "All "+filterName,
       "search": "Search "+filterName,
@@ -135,9 +194,9 @@ for (var link of settings.links){
       "create": "Create",
     }
     if (selectedFilters[filterName]){
-      filters.push(<MultiSelect multi={true} value={selectedFilters[filterName]} options={options} placeholder={"Select "+filterName} onChange={setFilter} overrideStrings={overrideStrings}/>)
+      filters.push(<MultiSelect multi={true} hasSelectAll={hasSelectAll} value={selectedFilters[filterName]} options={options} placeholder={"Select "+filterName} onChange={setFilter} overrideStrings={overrideStrings}/>)
     }else{
-      filters.push(<MultiSelect multi={true} options={options} placeholder={"Select "+filterName} onChange={setFilter} overrideStrings={overrideStrings}/>)
+      filters.push(<MultiSelect multi={true} hasSelectAll={hasSelectAll} options={options} placeholder={"Select "+filterName} onChange={setFilter} overrideStrings={overrideStrings}/>)
     }
     
   }
@@ -188,7 +247,7 @@ if (renderType=='Liveboard'){
   />
 }
 if (renderType=='Answer'){
-  renderPage = <SearchEmbed hideDataSources={true}  answerId={renderContent} frameParams={{width:'100%',height:'100vh'}}
+  renderPage = <SearchEmbed ref={embedRef} onLoad={onSearchRendered}  hideDataSources={true}  answerId={renderContent} frameParams={{width:'100%',height:'100vh'}}
   />
 }
 if (renderType=='Search String'){
@@ -202,7 +261,6 @@ if (renderType=='Search String'){
       }
     }
   }
-  console.log("filterString",filterString)
   var searchOptions = {
     searchTokenString: renderContent.split("|")[0]+filterString,
     executeSearch: true,
@@ -210,7 +268,7 @@ if (renderType=='Search String'){
   var dataSources = renderContent.split("|")[1].split(",");
   
   console.log("searchOptions",searchOptions,dataSources)
-  renderPage = <SearchEmbed dataSources={dataSources} hideDataSources={true} searchOptions={searchOptions} frameParams={{width:'100%',height:'100vh'}}
+  renderPage = <SearchEmbed  dataSources={dataSources} hideDataSources={true} searchOptions={searchOptions} frameParams={{width:'100%',height:'100vh'}}
   />
 }
 if (renderType=='App'){
@@ -256,7 +314,7 @@ return (
         </div>
 
       </div>
-      <div id="TSContainer">
+      <div id="TSContainer" key={renderKey}>
         {renderPage}
       </div>
   </div>
@@ -284,7 +342,9 @@ function LinkContainer(props){
       isDropdown=true;
     }
   }
-
+  document.addEventListener(EmbedEvent.CustomAction, function(stuff) {
+    console.log("got stuff!!!",stuff)
+  })
   function handleMouseEnter(){
     setHoverVisible(true)
   }
