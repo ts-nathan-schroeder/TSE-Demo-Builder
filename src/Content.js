@@ -1,5 +1,5 @@
 import React, { useState, useEffect, setState } from 'react';
-import { init,  AuthType, Page, EmbedEvent, Action} from '@thoughtspot/visual-embed-sdk';
+import { init,  AuthType, Page, EmbedEvent, Action, HostEvent} from '@thoughtspot/visual-embed-sdk';
 import { SearchEmbed, LiveboardEmbed, AppEmbed, useEmbedRef } from '@thoughtspot/visual-embed-sdk/react';
 import { MultiSelect } from "react-multi-select-component";
 
@@ -32,8 +32,9 @@ useEffect(() => {
       alert("could not connect to thoughtspot")
     }
   }
+  var defaultFilters = {}
   if (settings.links){
-    filterVals = []
+    var filterObjs = []
     var defaultsFound = false;
     for (var link of settings.links){
       if (settings.linkTypes[link]=='Filter'){
@@ -44,7 +45,13 @@ useEffect(() => {
             var prop = filterContent[i].split("=")[0]
             var val  = filterContent[i].split("=")[1]
             if (prop=='default'){
-              setFilter([{'value':filterName+'-'+val,'label':val}]);
+              var filterObj  = {
+                columnName: encodeURIComponent(filterName),
+                operator: 'IN',
+                values: [val]
+              }
+              defaultFilters[filterName] = [{label:val,value:val}]
+              filterObjs.push(filterObj)
               defaultsFound=true;
             }
           }
@@ -52,6 +59,10 @@ useEffect(() => {
       }
     }
   }
+  if (defaultsFound){
+    setRunFilters(filterObjs);
+    setSelectedFilters(defaultFilters)
+  } 
   if (!runFilters && !defaultsFound) setRunFilters([])
   if (!selectedFilters && !defaultsFound)  setSelectedFilters({})
 }, [])
@@ -64,48 +75,25 @@ function renderLink(type,content,name){
 
 }
 
-function setFilter(e){
-  var create = true;
-  var filterVals = []
-  var selectedFilterCopy = selectedFilters;
-
-  if (!selectedFilters || selectedFilters.length==0){
-    selectedFilterCopy={};
+function setFilter(newFilterObj){
+  var filterObjs = runFilters;
+  var found = false;
+  for (var i=0;i<filterObjs.length;i++){
+    var filterObj = filterObjs[i]
+    if (!filterObj) continue;
+    if (filterObj.columnName == newFilterObj.columnName){
+      filterObjs[i] = newFilterObj
+      found = true;
+    }
   }
-  if (e.length>0){
-    var filterName = e[0].value.split("-")[0]
-    for (var i=0;i<e.length;i++){
-      filterVals.push(e[i].label)
-    }
-    if (runFilters){
-      var filtersObj = runFilters
-      for (var i=0;i<filtersObj.length;i++){
-        if (filtersObj[i].columnName==filterName){  
-          filtersObj[i].values=filterVals
-        }
-        create=false;
-      }
-    }
-    if (create){
-      filtersObj = []
-      filtersObj.push({
-        columnName: encodeURIComponent(filterName),
-        operator: 'IN',
-        values: filterVals
-      })
-    }
-    selectedFilterCopy[filterName] = e;
-  }else{
-    selectedFilterCopy =[]
+  if (!found){
+    filterObjs.push(newFilterObj)
   }
-
-
-
-  setSelectedFilters(selectedFilterCopy);
-  setRunFilters(filtersObj)
-  setFilterKey(Date.now())
+  if (renderType=='Liveboard'){
+    embedRef.current.trigger(HostEvent.UpdateRuntimeFilters, filterObjs);
+  }
 }
-function onSearchRendered(){
+function onEmbedRendered(){
   embedRef.current.on(EmbedEvent.CustomAction, (payload) => {
     console.log(payload)
     
@@ -179,21 +167,15 @@ if (settings.links){
 
       var options = []
       for (var val in filterValues){
-        options.push({'value':filterName+'-'+filterValues[val],'label':filterValues[val]})
+        options.push({'value':filterValues[val],'label':filterValues[val]})
       }
       
-      var overrideStrings = {
-        "allItemsAreSelected": "All "+filterName,
-        "search": "Search "+filterName,
-        "selectAll": "Select All",
-        "selectAllFiltered": "Select All (Filtered)",
-        "selectSomeItems": filterName,
-        "create": "Create",
-      }
       if (selectedFilters[filterName]){
-        filters.push(<MultiSelect multi={true} hasSelectAll={hasSelectAll} value={selectedFilters[filterName]} options={options} placeholder={"Select "+filterName} onChange={setFilter} overrideStrings={overrideStrings}/>)
+        filters.push(<Filter hasSelectAll={hasSelectAll} filterName={filterName} options={options} setFilter={setFilter} defaultValues={selectedFilters[filterName]}></Filter>)
+        //ilters.push(<MultiSelect multi={true} hasSelectAll={hasSelectAll} value={selectedFilters[filterName]} options={options} placeholder={"Select "+filterName} onChange={setFilter} overrideStrings={overrideStrings}/>)
       }else{
-        filters.push(<MultiSelect multi={true} hasSelectAll={hasSelectAll} options={options} placeholder={"Select "+filterName} onChange={setFilter} overrideStrings={overrideStrings}/>)
+        filters.push(<Filter hasSelectAll={hasSelectAll} filterName={filterName} options={options} setFilter={setFilter}></Filter>)
+        //filters.push(<MultiSelect multi={true} hasSelectAll={hasSelectAll} options={options} placeholder={"Select "+filterName} onChange={setFilter} overrideStrings={overrideStrings}/>)
       }
       
     }
@@ -260,15 +242,34 @@ if (renderType=='Search'){
   if (renderContent){
     renderContents = renderContent.split("|")[0].split(",")
   }
-  renderPage = <SearchEmbed enabledActions={enabledActions.length>0 ? enabledActions : null} disabledActions={disabledActions.length>0 ? disabledActions : null} dataSources={renderContents} hideDataSources={true} frameParams={{width:'100%',height:'100vh'}}
+  renderPage = <SearchEmbed 
+      enabledActions={enabledActions.length>0 ? enabledActions : null} 
+      disabledActions={disabledActions.length>0 ? disabledActions : null} 
+      dataSources={renderContents} 
+      hideDataSources={true} 
+      frameParams={{width:'100%',height:'100vh'}}
   />
 }
 if (renderType=='Liveboard'){
-  renderPage = <LiveboardEmbed key={filterKey} enabledActions={enabledActions.length>0 ? enabledActions : null} disabledActions={disabledActions.length>0 ? disabledActions : null}  hideDataSources={true}  runtimeFilters={runFilters}  liveboardId={renderContent.split("|")[0]} frameParams={{width:'100%',height:'100vh'}}
+  renderPage = <LiveboardEmbed 
+      ref={embedRef} 
+      onLiveboardRendered = {onEmbedRendered}
+      enabledActions={enabledActions.length>0 ? enabledActions : null} 
+      disabledActions={disabledActions.length>0 ? disabledActions : null}  
+      hideDataSources={true}  
+      runtimeFilters={runFilters}  
+      liveboardId={renderContent.split("|")[0]} 
+      frameParams={{width:'100%',height:'100vh'}}
   />
 }
 if (renderType=='Answer'){
-  renderPage = <SearchEmbed ref={embedRef} enabledActions={enabledActions.length>0 ? enabledActions : null} disabledActions={disabledActions.length>0 ? disabledActions : null}  onLoad={onSearchRendered}  hideDataSources={true}  answerId={renderContent.split("|")[0]} frameParams={{width:'100%',height:'100vh'}}
+  renderPage = <SearchEmbed ref={embedRef} 
+      enabledActions={enabledActions.length>0 ? enabledActions : null} 
+      disabledActions={disabledActions.length>0 ? disabledActions : null}  
+      onLoad={onEmbedRendered}  
+      hideDataSources={true}  
+      answerId={renderContent.split("|")[0]} 
+      frameParams={{width:'100%',height:'100vh'}}
   />
 }
 if (renderType=='Search String'){
@@ -393,7 +394,7 @@ function LinkContainer(props){
   </div>)
 }
 
-
+// CSS to be used for vertical and horizontal alignments
 const leftMenu = {
   background: 'var(--primary-color)',
   color: 'var(--secondary-color)',
@@ -499,6 +500,61 @@ const hoverMenuVertical = {
   left: '150px',
   marginTop:'-29px',
 }
+
+function Filter(props){
+  const {
+    hasSelectAll,
+    filterName,
+    options,
+    setFilter,
+    defaultValues
+  } = props
+  const [selectedFilter, setSelectedFilter] = useState('')
+  
+  useEffect(() => {
+    console.log("deaulrae",defaultValues)
+    if (defaultValues){
+      setSelectedFilter(defaultValues)
+    }else{
+      setSelectedFilter([])
+    }
+  }, [])
+  
+  var overrideStrings = {
+    "allItemsAreSelected": "All "+filterName,
+    "search": "Search "+filterName,
+    "selectAll": "Select All",
+    "selectAllFiltered": "Select All (Filtered)",
+    "selectSomeItems": filterName,
+    "create": "Create",
+  }
+  function handleFilterChange(e){
+    var filterVals = []
+    for (var i=0;i<e.length;i++){
+      filterVals.push(e[i].label)
+    }
+    var filtersObj  = {
+      columnName: encodeURIComponent(filterName),
+      operator: 'IN',
+      values: filterVals
+    }
+    setSelectedFilter(e)
+    setFilter(filtersObj)
+  }
+  console.log("setting up filter",options,selectedFilter)
+
+  return (
+  <MultiSelect 
+    multi={true} 
+    hasSelectAll={hasSelectAll} 
+    value={selectedFilter} 
+    options={options} 
+    placeholder={"Select "+filterName} 
+    onChange={handleFilterChange} 
+    overrideStrings={overrideStrings}/>
+  )
+}
+
 function UserIcon(){
   return <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24" width="24" fill="currentColor"><path d="M10 20C4.477 20 0 15.523 0 10S4.477 0 10 0s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm0-14a4 4 0 0 1 4 4v2a4 4 0 1 1-8 0V8a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v2a2 2 0 1 0 4 0V8a2 2 0 0 0-2-2zM5.91 16.876a8.033 8.033 0 0 1-1.58-1.232 5.57 5.57 0 0 1 2.204-1.574 1 1 0 1 1 .733 1.86c-.532.21-.993.538-1.358.946zm8.144.022a3.652 3.652 0 0 0-1.41-.964 1 1 0 1 1 .712-1.868 5.65 5.65 0 0 1 2.284 1.607 8.032 8.032 0 0 1-1.586 1.225z"></path></svg>
 }
