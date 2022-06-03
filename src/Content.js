@@ -1,5 +1,5 @@
 import React, { useState, useEffect, setState } from 'react';
-import { init,  AuthType, Page, EmbedEvent} from '@thoughtspot/visual-embed-sdk';
+import { init,  AuthType, Page, EmbedEvent, Action} from '@thoughtspot/visual-embed-sdk';
 import { SearchEmbed, LiveboardEmbed, AppEmbed, useEmbedRef } from '@thoughtspot/visual-embed-sdk/react';
 import { MultiSelect } from "react-multi-select-component";
 
@@ -44,7 +44,6 @@ useEffect(() => {
             var prop = filterContent[i].split("=")[0]
             var val  = filterContent[i].split("=")[1]
             if (prop=='default'){
-              console.log("setting default filter",{'value':filterName+'-'+val,'label':val})
               setFilter([{'value':filterName+'-'+val,'label':val}]);
               defaultsFound=true;
             }
@@ -158,47 +157,46 @@ if (settings.links){
   }
 }
 var filters = []
-for (var link of settings.links){
-  if (settings.linkTypes[link]=='Filter' && settings.linkParents[link]==renderName){
-    var filterContent = settings.linkContents[link].split("|")
-    
-    var  hasSelectAll = true;
-    var defaultValue = '';
-  
-    var filterValues = filterContent[0].split(',')
-    var filterName = settings.linkNames[link]
-
-    if (filterContent.length>1){
-      for (var i=1;i<filterContent.length;i++){
-        var prop = filterContent[i].split("=")[0]
-        var val  = filterContent[i].split("=")[1]
-        if (prop=='selectAll'){
-          if (val=='false'){
-            hasSelectAll=false;  
+if (settings.links){
+  for (var link of settings.links){
+    if (settings.linkTypes[link]=='Filter' && settings.linkParents[link]==renderName){
+      var filterContent = settings.linkContents[link].split("|")
+      var  hasSelectAll = true;
+      var defaultValue = '';
+      var filterValues = filterContent[0].split(',')
+      var filterName = settings.linkNames[link]
+      if (filterContent.length>1){
+        for (var i=1;i<filterContent.length;i++){
+          var prop = filterContent[i].split("=")[0]
+          var val  = filterContent[i].split("=")[1]
+          if (prop=='selectAll'){
+            if (val=='false'){
+              hasSelectAll=false;  
+            }
           }
         }
       }
-    }
 
-    var options = []
-    for (var val in filterValues){
-      options.push({'value':filterName+'-'+filterValues[val],'label':filterValues[val]})
+      var options = []
+      for (var val in filterValues){
+        options.push({'value':filterName+'-'+filterValues[val],'label':filterValues[val]})
+      }
+      
+      var overrideStrings = {
+        "allItemsAreSelected": "All "+filterName,
+        "search": "Search "+filterName,
+        "selectAll": "Select All",
+        "selectAllFiltered": "Select All (Filtered)",
+        "selectSomeItems": filterName,
+        "create": "Create",
+      }
+      if (selectedFilters[filterName]){
+        filters.push(<MultiSelect multi={true} hasSelectAll={hasSelectAll} value={selectedFilters[filterName]} options={options} placeholder={"Select "+filterName} onChange={setFilter} overrideStrings={overrideStrings}/>)
+      }else{
+        filters.push(<MultiSelect multi={true} hasSelectAll={hasSelectAll} options={options} placeholder={"Select "+filterName} onChange={setFilter} overrideStrings={overrideStrings}/>)
+      }
+      
     }
-    
-    var overrideStrings = {
-      "allItemsAreSelected": "All "+filterName,
-      "search": "Search "+filterName,
-      "selectAll": "Select All",
-      "selectAllFiltered": "Select All (Filtered)",
-      "selectSomeItems": filterName,
-      "create": "Create",
-    }
-    if (selectedFilters[filterName]){
-      filters.push(<MultiSelect multi={true} hasSelectAll={hasSelectAll} value={selectedFilters[filterName]} options={options} placeholder={"Select "+filterName} onChange={setFilter} overrideStrings={overrideStrings}/>)
-    }else{
-      filters.push(<MultiSelect multi={true} hasSelectAll={hasSelectAll} options={options} placeholder={"Select "+filterName} onChange={setFilter} overrideStrings={overrideStrings}/>)
-    }
-    
   }
 }
 
@@ -232,22 +230,45 @@ if (!isHorizontal){
 
 }
 
+var enabledActions = []
+var disabledActions = []
+
+//Scan Properties
+if (renderType=='Liveboard' || renderType=='Answer' || renderType=='Search'){
+  var contents = renderContent.split("|")
+  if (contents.length>1){
+    for (var i=1;i<contents.length;i++){
+      var props = contents[i].split("=");
+      if (props.length>1){
+        var prop = props[0]
+        var val = props[1]
+        if (prop == 'enableAction'){
+          enabledActions.push(Action[val.split("Action.")[1]])
+        }
+        if (prop == 'disableAction'){
+          disabledActions.push(Action[val.split("Action.")[1]])
+        }
+      }
+    }
+  }
+}
+
 
 var renderPage = <div>Select a Link!</div>
 if (renderType=='Search'){
   var renderContents=null
   if (renderContent){
-    renderContents = renderContent.split(",")
+    renderContents = renderContent.split("|")[0].split(",")
   }
-  renderPage = <SearchEmbed dataSources={renderContents} hideDataSources={true} frameParams={{width:'100%',height:'100vh'}}
+  renderPage = <SearchEmbed enabledActions={enabledActions.length>0 ? enabledActions : null} disabledActions={disabledActions.length>0 ? disabledActions : null} dataSources={renderContents} hideDataSources={true} frameParams={{width:'100%',height:'100vh'}}
   />
 }
 if (renderType=='Liveboard'){
-  renderPage = <LiveboardEmbed key={filterKey} hideDataSources={true}  runtimeFilters={runFilters}  liveboardId={renderContent} frameParams={{width:'100%',height:'100vh'}}
+  renderPage = <LiveboardEmbed key={filterKey} enabledActions={enabledActions.length>0 ? enabledActions : null} disabledActions={disabledActions.length>0 ? disabledActions : null}  hideDataSources={true}  runtimeFilters={runFilters}  liveboardId={renderContent.split("|")[0]} frameParams={{width:'100%',height:'100vh'}}
   />
 }
 if (renderType=='Answer'){
-  renderPage = <SearchEmbed ref={embedRef} onLoad={onSearchRendered}  hideDataSources={true}  answerId={renderContent} frameParams={{width:'100%',height:'100vh'}}
+  renderPage = <SearchEmbed ref={embedRef} enabledActions={enabledActions.length>0 ? enabledActions : null} disabledActions={disabledActions.length>0 ? disabledActions : null}  onLoad={onSearchRendered}  hideDataSources={true}  answerId={renderContent.split("|")[0]} frameParams={{width:'100%',height:'100vh'}}
   />
 }
 if (renderType=='Search String'){
@@ -342,9 +363,7 @@ function LinkContainer(props){
       isDropdown=true;
     }
   }
-  document.addEventListener(EmbedEvent.CustomAction, function(stuff) {
-    console.log("got stuff!!!",stuff)
-  })
+
   function handleMouseEnter(){
     setHoverVisible(true)
   }
