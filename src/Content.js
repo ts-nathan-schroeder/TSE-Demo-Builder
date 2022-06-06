@@ -91,6 +91,9 @@ function setFilter(newFilterObj){
   }
   if (renderType=='Liveboard'){
     embedRef.current.trigger(HostEvent.UpdateRuntimeFilters, filterObjs);
+  }else{
+    setRunFilters(filterObjs);
+    setFilterKey(Date.now())
   }
 }
 function onEmbedRendered(){
