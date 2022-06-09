@@ -295,7 +295,10 @@ return (
       <div className='linkHeader'>
         <div style={{width:'110px'}}>Name</div><div style={{width:'90px'}}>Type</div><div style={{width:'240px'}}>Configuration</div><div>Parent</div>
       </div>
+      <div style={{maxHeight:'400px',overflow:'auto'}}>
       {linkObjs}
+
+      </div>
     </div>
     <div className="button" onClick={addLink}>
       <PlusIcon />

@@ -73,7 +73,7 @@ function App() {
     top:50,
     left:300,
     width:'600px',
-    height:'700px',
+    height:'740px',
     background:'#ffffff',
     boxShadow: '0px 0px 250px #ededed',
     padding:'25px'

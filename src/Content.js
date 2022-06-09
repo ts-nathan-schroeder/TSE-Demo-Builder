@@ -302,6 +302,10 @@ if (renderType=='App'){
 if (renderType=='URL'){
   renderPage = <iframe  style={{width:'100%',height:'100%',border:'none'}} src={renderContent}></iframe>
 }
+
+document.title = settings.name
+
+
 function openTS(){
   window.open(settings.URL,'_blank')
 }
