@@ -180,3 +180,6 @@ svg:hover{
   color:#666;
   margin-bottom: var(--dropdown-container-bottom-margin);
 }
+.hoverer:hover{
+  cursor:pointer
+}
