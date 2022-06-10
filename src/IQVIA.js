@@ -1,5 +1,5 @@
 import React, { useState, useEffect, setState } from 'react';
-import { init, AuthType } from "@thoughtspot/visual-embed-sdk";
+import { init, AuthType, Action } from "@thoughtspot/visual-embed-sdk";
 import { SearchEmbed, LiveboardEmbed, AppEmbed, useEmbedRef } from '@thoughtspot/visual-embed-sdk/react';
 
 function IQVIA() {
@@ -70,11 +70,9 @@ function IQVIA() {
                 tsVisible ? 
                 <div style={{position:'absolute', width:'70%', height:'70%', top:'10%',left:'15%'}}>
                     <div onClick={hideReport} style={{display:'flex',justifyContent:'flex-end',alignItems:'center'}}>
-                        <div style={{color:'#646464'}}>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24" width="24" fill="currentColor"><path d="M11.414 10l2.829-2.828a1 1 0 1 0-1.415-1.415L10 8.586 7.172 5.757a1 1 0 0 0-1.415 1.415L8.586 10l-2.829 2.828a1 1 0 0 0 1.415 1.415L10 11.414l2.828 2.829a1 1 0 0 0 1.415-1.415L11.414 10zM4 0h12a4 4 0 0 1 4 4v12a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V4a4 4 0 0 1 4-4z"></path></svg>
-                        </div>
+                        <svg style={{color:'#ffffff'}} xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24" width="24" fill="currentColor"><path d="M11.414 10l2.829-2.828a1 1 0 1 0-1.415-1.415L10 8.586 7.172 5.757a1 1 0 0 0-1.415 1.415L8.586 10l-2.829 2.828a1 1 0 0 0 1.415 1.415L10 11.414l2.828 2.829a1 1 0 0 0 1.415-1.415L11.414 10zM4 0h12a4 4 0 0 1 4 4v12a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V4a4 4 0 0 1 4-4z"></path></svg>
                     </div>
-                    <div style={{boxShadow:'0px 0px 105px #636363cc',background:'#f6f8fa'}}>
+                    <div style={{boxShadow:'0px 0px 255px #636363dd',background:'#f6f8fa'}}>
                             <SearchEmbed       
                                 hideDataSources={true} 
                                 dataSources={['782b50d1-fe89-4fee-812f-b5f9eb0a552d']} 
@@ -83,7 +81,12 @@ function IQVIA() {
                                 searchOptions={{ 
                                     searchTokenString: searchString,
                                     executeSearch: true,
-                                }} />
+                                }} 
+                                hiddenActions={[Action.Pin,
+                                    Action.Save,
+                                    Action.Share, Action.Download, Action.EditDetails, Action.QueryDetailsButtons
+                                ]}
+                                />
                     </div>
                 </div>
                 : <div></div>
