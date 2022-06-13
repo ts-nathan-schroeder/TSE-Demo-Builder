@@ -250,7 +250,7 @@ if (renderType=='Search'){
       disabledActions={disabledActions.length>0 ? disabledActions : null} 
       dataSources={renderContents} 
       hideDataSources={true} 
-      frameParams={{width:'100%',height:'100vh'}}
+      frameParams={{width:'100%',height:'100%'}}
   />
 }
 if (renderType=='Liveboard'){
@@ -262,7 +262,7 @@ if (renderType=='Liveboard'){
       hideDataSources={true}  
       runtimeFilters={runFilters}  
       liveboardId={renderContent.split("|")[0]} 
-      frameParams={{width:'100%',height:'100vh'}}
+      frameParams={{width:'100%',height:'100%'}}
   />
 }
 if (renderType=='Answer'){
@@ -297,7 +297,7 @@ if (renderType=='Search String'){
   />
 }
 if (renderType=='App'){
-  renderPage = <AppEmbed pageId={renderContent} frameParams={{width:'100%',height:'100vh'}} />
+  renderPage = <AppEmbed pageId={renderContent} frameParams={{width:'100%',height:'100%'}} />
 }
 if (renderType=='URL'){
   renderPage = <iframe  style={{width:'100%',height:'100%',border:'none'}} src={renderContent}></iframe>
@@ -343,7 +343,7 @@ return (
         </div>
 
       </div>
-      <div id="TSContainer" key={renderKey}>
+      <div id="TSContainer" style={{height:'100%'}} key={renderKey}>
         {renderPage}
       </div>
   </div>
@@ -428,12 +428,15 @@ const verticalContainer = {
   flexDirection: 'row',
   width: '100%',
   height: '100vh',
+  overflow: 'hidden'
 }
 const horizontalContainer = {
   display:'flex',
   flexDirection: 'column',
   width: '100%',
   height: '100vh',
+  overflow: 'hidden'
+
 }
 
 const logoImageHolderVertical = {
