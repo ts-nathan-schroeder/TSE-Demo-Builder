@@ -11,7 +11,7 @@ function IQVIA() {
         init({
             thoughtSpotHost: 'https://se-thoughtspot-cloud.thoughtspot.cloud/#',
             authType: AuthType.None,
-            customCssUrl: 'raw.githubusercontent.com/hannsta/TSE-Demo-Builder/iqvia/public/csstest.css'
+            customCssUrl: 'cdn.jsdelivr.net/gh/hannsta/TSE-Demo-Builder@iqvia/public/csstest.css'
         });
         setTsVisible(false);
     }, [])

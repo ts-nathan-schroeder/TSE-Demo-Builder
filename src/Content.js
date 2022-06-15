@@ -26,6 +26,7 @@ useEffect(() => {
       init({
         thoughtSpotHost: settings.URL,
         authType: AuthType.None,
+        customCssUrl: 'cdn.jsdelivr.net/gh/hannsta/TSE-Demo-Builder@iqvia/public/csstest.css',
       });
     }
     catch(err){
