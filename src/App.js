@@ -70,10 +70,11 @@ function App() {
   const popover = {
     position: 'absolute',
     zIndex: '2',
-    top:50,
-    left:300,
-    width:'600px',
-    height:'740px',
+    top:'5%',
+    left:'25%',
+    width:'70%',
+    minWidth:'600px',
+    height:'85%',
     background:'#ffffff',
     boxShadow: '0px 0px 250px #ededed',
     padding:'25px'

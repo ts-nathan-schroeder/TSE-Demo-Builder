@@ -69,14 +69,14 @@ This is what will be displayed in the nav menu
 | Answer | TS Search embed, with a default answer. | Answer GUID |
 | Liveboard | TS Liveboard embed. | Liveboard GUID. |
 | Menu | This link will expose a sub-menu on hover. Contents of this menu will be determined by the parent dropdown. | None |
-| URL | This will embed a webpage within an Iframe. Good for specifying a home page that is the client's actual website, but may not work on secure sites. Upload an image of the website to something like dropbox and use this as a link to that. | Full URL |
+| URL | This will embed a webpage within an Iframe. Note that not all webpages allow this. As an alternative, you can link to dropbox, or place an image inside the "public" folder of this application. | Full URL |
 | Full App | This will embed the thoughtspot application, landing on the page specified in the configuration panel. | Home, Liveboards, Answers, SpotIQ,  Data |
 | Filter| This attaches a custom filter to a Liveboard or Search String embed, that can be used to supply runtime filter values.  | The Name of the filter should be your column name. The configuration section contains a comma seperated list of possible values for that filter |
 | Search String | This will render a search embed with a specific search string. | The first part contains the TML searech - eg: [sales] [state]. The second part contains the GUUID of a datasource. These need to be seperated by a vertical bar "|". |
 
 
 ### Custom Actions
-Any Custom Action that has been created as a "Callback" (as opposed to URL) can be leveraged on an Answer. When the action is triggered, an alert will be generated showing the name of the action that was triggered, and current dataset of the Answer.
+Any Custom Action that has been created as a "Callback" can be leveraged on an Answer Embed. When the action is triggered, an alert will be generated showing the name of the action that was triggered, and current dataset of the Answer.
 
 ### Disabling UI Components
 UI actions can be disabled on Answers, Liveboards, and Search Embeds. To do this, add 'disableAction' and 'enableAction' parameters to the end of the configuration. In the example below, we are disabling "Share" and "Save" on the given answer.

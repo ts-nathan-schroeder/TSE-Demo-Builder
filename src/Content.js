@@ -17,7 +17,7 @@ const [runFilters, setRunFilters] = useState('')
 const [selectedFilters, setSelectedFilters] = useState('')
 const [filterKey, setFilterKey] = useState('')
 const [renderKey, setRenderKey] = useState('')
-
+const [searchFields , setSearchFields] = useState('')
 const embedRef = useEmbedRef();
 
 useEffect(() => {
@@ -46,7 +46,7 @@ useEffect(() => {
             var val  = filterContent[i].split("=")[1]
             if (prop=='default'){
               var filterObj  = {
-                columnName: encodeURIComponent(filterName),
+                columnName: filterName,
                 operator: 'IN',
                 values: [val]
               }
@@ -74,7 +74,39 @@ function renderLink(type,content,name){
   setRenderKey(Date.now())
 
 }
+function buildSearchString(searchingFields,filteringFields){
+  if (!searchingFields) searchingFields = searchFields
+  if (!filteringFields) filteringFields = runFilters
 
+  var filterString = ""
+  if (searchingFields){
+    for (var field of searchingFields){
+        filterString+=" ["+field+"]"
+    }
+  }
+  if (filteringFields){
+    for (var filter of filteringFields){
+      var filterVals = filter.values
+      for (var val of filterVals){
+        filterString+=" ["+filter.columnName+"].'"+val+"'"
+      }
+    }
+  }
+  var searchString = renderContent.split("|")[0]+filterString
+  console.log("runtime search string", searchString)
+  return searchString
+}
+
+
+function setField(fields){
+  // embedRef.current.trigger(HostEvent.Search, {
+  //   searchQuery: buildSearchString(fields, null),
+  //   executeSearch: true,
+
+  // });
+  setSearchFields(fields)
+
+}
 function setFilter(newFilterObj){
   var filterObjs = runFilters;
   var found = false;
@@ -93,12 +125,15 @@ function setFilter(newFilterObj){
     embedRef.current.trigger(HostEvent.UpdateRuntimeFilters, filterObjs);
   }else{
     setRunFilters(filterObjs);
-    setFilterKey(Date.now())
+
+    // embedRef.current.trigger(HostEvent.Search, {
+    //   searchQuery: buildSearchString(null,filterObjs)
+    // });
   }
+
 }
 function onEmbedRendered(){
   embedRef.current.on(EmbedEvent.CustomAction, (payload) => {
-    console.log(payload)
     
     var data = payload.data.embedAnswerData.data[0].columnDataLite
     var alertString = "Action Triggered: "+ payload.data.id
@@ -150,7 +185,7 @@ if (settings.links){
 var filters = []
 if (settings.links){
   for (var link of settings.links){
-    if (settings.linkTypes[link]=='Filter' && settings.linkParents[link]==renderName){
+    if ((settings.linkTypes[link]=='Filter' || settings.linkTypes[link]=='Field') && settings.linkParents[link]==renderName){
       var filterContent = settings.linkContents[link].split("|")
       var  hasSelectAll = true;
       var defaultValue = '';
@@ -167,17 +202,20 @@ if (settings.links){
           }
         }
       }
-
+      var filterType = 'Filter'
+      if (settings.linkTypes[link]=='Field'){
+        filterType='Field'
+      }
       var options = []
       for (var val in filterValues){
         options.push({'value':filterValues[val],'label':filterValues[val]})
       }
       
       if (selectedFilters[filterName]){
-        filters.push(<Filter hasSelectAll={hasSelectAll} filterName={filterName} options={options} setFilter={setFilter} defaultValues={selectedFilters[filterName]}></Filter>)
+        filters.push(<Filter type={filterType} setField={setField} hasSelectAll={hasSelectAll} filterName={filterName} options={options} setFilter={setFilter} defaultValues={selectedFilters[filterName]}></Filter>)
         //ilters.push(<MultiSelect multi={true} hasSelectAll={hasSelectAll} value={selectedFilters[filterName]} options={options} placeholder={"Select "+filterName} onChange={setFilter} overrideStrings={overrideStrings}/>)
       }else{
-        filters.push(<Filter hasSelectAll={hasSelectAll} filterName={filterName} options={options} setFilter={setFilter}></Filter>)
+        filters.push(<Filter type={filterType} setField={setField}  hasSelectAll={hasSelectAll} filterName={filterName} options={options} setFilter={setFilter}></Filter>)
         //filters.push(<MultiSelect multi={true} hasSelectAll={hasSelectAll} options={options} placeholder={"Select "+filterName} onChange={setFilter} overrideStrings={overrideStrings}/>)
       }
       
@@ -219,7 +257,7 @@ var enabledActions = []
 var disabledActions = []
 
 //Scan Properties
-if (renderType=='Liveboard' || renderType=='Answer' || renderType=='Search'){
+if (renderContent && (renderType=='Liveboard' || renderType=='Answer' || renderType=='Search')){
   var contents = renderContent.split("|")
   if (contents.length>1){
     for (var i=1;i<contents.length;i++){
@@ -239,7 +277,11 @@ if (renderType=='Liveboard' || renderType=='Answer' || renderType=='Search'){
 }
 
 
-var renderPage = <div>Select a Link!</div>
+var renderPage = <div></div>
+if (!renderType && settings){
+  var firstLink =  settings.links[0]
+  renderLink(settings.linkTypes[firstLink],settings.linkContents[firstLink],settings.linkNames[firstLink])
+}
 if (renderType=='Search'){
   var renderContents=null
   if (renderContent){
@@ -276,24 +318,15 @@ if (renderType=='Answer'){
   />
 }
 if (renderType=='Search String'){
-
-  var filterString = ""
-  if (runFilters){
-    for (var filter of runFilters){
-      var filterVals = filter.values
-      for (var val of filterVals){
-        filterString+=" ["+filter.columnName+"].'"+val+"'"
-      }
-    }
-  }
+  var searchString = buildSearchString()
+  console.log("init search String",searchString)
   var searchOptions = {
-    searchTokenString: renderContent.split("|")[0]+filterString,
+    searchTokenString: searchString,
     executeSearch: true,
   }
   var dataSources = renderContent.split("|")[1].split(",");
   
-  console.log("searchOptions",searchOptions,dataSources)
-  renderPage = <SearchEmbed  dataSources={dataSources} hideDataSources={true} searchOptions={searchOptions} frameParams={{width:'100%',height:'100vh'}}
+  renderPage = <SearchEmbed ref={embedRef}  dataSources={dataSources} hideDataSources={true} searchOptions={searchOptions} frameParams={{width:'100%',height:'100vh'}}
   />
 }
 if (renderType=='App'){
@@ -516,13 +549,14 @@ function Filter(props){
     hasSelectAll,
     filterName,
     options,
+    type,
     setFilter,
+    setField,
     defaultValues
   } = props
   const [selectedFilter, setSelectedFilter] = useState('')
   
   useEffect(() => {
-    console.log("deaulrae",defaultValues)
     if (defaultValues){
       setSelectedFilter(defaultValues)
     }else{
@@ -538,20 +572,27 @@ function Filter(props){
     "selectSomeItems": filterName,
     "create": "Create",
   }
+  function handleFieldChange(e){
+    setSelectedFilter(e)
+    var filterVals = []
+    for (var i=0;i<e.length;i++){
+      filterVals.push(e[i].label)
+    }
+    setField(filterVals)
+  }
   function handleFilterChange(e){
     var filterVals = []
     for (var i=0;i<e.length;i++){
       filterVals.push(e[i].label)
     }
     var filtersObj  = {
-      columnName: encodeURIComponent(filterName),
+      columnName: filterName,
       operator: 'IN',
       values: filterVals
     }
     setSelectedFilter(e)
     setFilter(filtersObj)
   }
-  console.log("setting up filter",options,selectedFilter)
 
   return (
   <MultiSelect 
@@ -560,7 +601,7 @@ function Filter(props){
     value={selectedFilter} 
     options={options} 
     placeholder={"Select "+filterName} 
-    onChange={handleFilterChange} 
+    onChange={type == 'Field' ? handleFieldChange: handleFilterChange} 
     overrideStrings={overrideStrings}/>
   )
 }

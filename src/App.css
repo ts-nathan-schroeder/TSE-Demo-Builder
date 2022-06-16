@@ -26,7 +26,10 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
-
+.addLink{
+  min-height:35px;
+  margin-top:10px;
+}
 .App-link {
   color: #61dafb;
 }
@@ -67,8 +70,19 @@ body{
   cursor:pointer;
 }
 .settingLabel{
-  margin-top:15px;
+  margin-top:10px;
   margin-bottom:5px;
+}
+#settingsContainer{
+  height:100%;
+  display: flex;
+  flex-direction: column;
+}
+.linkContainer{
+  display: flex;
+  flex-direction: column;
+  height:100%;
+  overflow: auto;
 }
 .link svg{
   height:20px;
