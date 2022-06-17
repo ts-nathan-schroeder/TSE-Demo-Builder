@@ -299,7 +299,7 @@ return (
 
     <div className="settingLabel">Links</div> 
     <div className='linkHeader'>
-        <div style={{width:'110px'}}>Name</div><div style={{width:'90px'}}>Type</div><div style={{width:'240px'}}>Configuration</div><div>Parent</div>
+        <div style={{width:'110px'}}>Name</div><div style={{width:'90px'}}>Type</div><div style={{flex:1}}>Configuration</div><div style={{width:'160px'}}>Parent</div>
       </div>
     <div className="linkContainer">
 
@@ -374,7 +374,7 @@ function Link(props){
       'Search String':'[tml] [search] [query] |WorksheetGUID',
       'URL':'URL of website or image'
     }
-    contentInput = <input style={{flex:1, border:'1px solid #cccccccc', marginRight:'5px'}} placeholder={placeholders[type]} value={content} onChange={e => handleContentChange(e.target.value)} />;
+    contentInput = <input style={{flex:1,border:'1px solid #cccccccc', borderRadius:'5px', marginRight:'5px'}} placeholder={placeholders[type]} value={content} onChange={e => handleContentChange(e.target.value)} />;
   }
 
   var parentOptions = []

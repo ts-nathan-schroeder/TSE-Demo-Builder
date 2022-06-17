@@ -13,7 +13,21 @@
   }
 }
 
-
+input{
+  border:1px solid #cccccccc;
+  border-radius:5px;
+  color: #222;
+  background:#efefefcc;
+}
+select{
+  border:2px solid #666;
+  border-radius:5px;
+  color: #222;
+  font-weight:600;
+}
+.link svg{
+  color:#444;
+}
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
 
 .App-header {
