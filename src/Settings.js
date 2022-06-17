@@ -374,7 +374,7 @@ function Link(props){
       'Search String':'[tml] [search] [query] |WorksheetGUID',
       'URL':'URL of website or image'
     }
-    contentInput = <input style={{flex:1,marginRight:'5px'}} placeholder={placeholders[type]} value={content} onChange={e => handleContentChange(e.target.value)} />;
+    contentInput = <input style={{flex:1, border:'1px solid #cccccccc', marginRight:'5px'}} placeholder={placeholders[type]} value={content} onChange={e => handleContentChange(e.target.value)} />;
   }
 
   var parentOptions = []
@@ -412,7 +412,7 @@ function Link(props){
         <option value="App">Full App</option>
         <option value="URL">URL</option>
         <option value="Search String">Search String</option>
-        <option value="Filter">Filter</option>
+        <option value="Filter">Filter (Liveboard & Search String)</option>
         <option value="Field">Field (Search String)</option>
       </select>
       {contentInput}

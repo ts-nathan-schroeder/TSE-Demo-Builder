@@ -278,13 +278,13 @@ if (renderContent && (renderType=='Liveboard' || renderType=='Answer' || renderT
 
 
 var renderPage = <div></div>
-if (!renderType && settings){
+if (!renderType && settings && settings.links){
   var firstLink =  settings.links[0]
   renderLink(settings.linkTypes[firstLink],settings.linkContents[firstLink],settings.linkNames[firstLink])
 }
 if (renderType=='Search'){
   var renderContents=null
-  if (renderContent){
+  if (renderContent && renderContent.length>0){
     renderContents = renderContent.split("|")[0].split(",")
   }
   renderPage = <SearchEmbed 
