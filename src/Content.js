@@ -8,7 +8,7 @@ const {
   settings,
   showSettings
 } = props
-const thoughtspot_URL = "https://se-thoughtspot-cloud.thoughtspot.cloud/#" 
+const thoughtspot_URL = "https://se-thoughtspot-cloud.thoughtspot.cloud/#/" 
 
 const [renderType, setRenderType] = useState('')
 const [renderContent, setRenderContent] = useState('')
@@ -22,6 +22,7 @@ const embedRef = useEmbedRef();
 
 useEffect(() => {
   if (settings.URL){
+    console.log(settings.URL)
     try {
       init({
         thoughtSpotHost: settings.URL,
@@ -93,7 +94,6 @@ function buildSearchString(searchingFields,filteringFields){
     }
   }
   var searchString = renderContent.split("|")[0]+filterString
-  console.log("runtime search string", searchString)
   return searchString
 }
 
@@ -280,7 +280,7 @@ if (renderContent && (renderType=='Liveboard' || renderType=='Answer' || renderT
 var renderPage = <div></div>
 if (!renderType && settings && settings.links){
   var firstLink =  settings.links[0]
-  renderLink(settings.linkTypes[firstLink],settings.linkContents[firstLink],settings.linkNames[firstLink])
+  //renderLink(settings.linkTypes[firstLink],settings.linkContents[firstLink],settings.linkNames[firstLink])
 }
 if (renderType=='Search'){
   var renderContents=null
