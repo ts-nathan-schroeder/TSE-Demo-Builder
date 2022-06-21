@@ -78,11 +78,13 @@ function renderLink(type,content,name){
 function buildSearchString(searchingFields,filteringFields){
   if (!searchingFields) searchingFields = searchFields
   if (!filteringFields) filteringFields = runFilters
-
+  console.log(searchingFields,filteringFields)
   var filterString = ""
   if (searchingFields){
-    for (var field of searchingFields){
-        filterString+=" ["+field+"]"
+    for (var key of Object.keys(searchingFields)){
+      for (var field of searchingFields[key]){
+        filterString+=" "+field
+    } 
     }
   }
   if (filteringFields){
@@ -98,13 +100,13 @@ function buildSearchString(searchingFields,filteringFields){
 }
 
 
-function setField(fields){
+function setField(key,fields){
   // embedRef.current.trigger(HostEvent.Search, {
   //   searchQuery: buildSearchString(fields, null),
   //   executeSearch: true,
 
   // });
-  setSearchFields(fields)
+  setSearchFields({ ...searchFields, [key]: fields });
 
 }
 function setFilter(newFilterObj){
@@ -190,6 +192,18 @@ if (settings.links){
       var  hasSelectAll = true;
       var defaultValue = '';
       var filterValues = filterContent[0].split(',')
+      var filterLabels = []
+      
+      if (settings.linkTypes[link]=='Field'){
+        var filterOptions = []
+        for (var val of filterValues){
+          filterOptions.push(val.split(":")[0])
+          filterLabels.push(val.split(":")[1])
+        }
+        filterValues = filterOptions
+      }else{
+        filterLabels = filterValues
+      }
       var filterName = settings.linkNames[link]
       if (filterContent.length>1){
         for (var i=1;i<filterContent.length;i++){
@@ -208,7 +222,7 @@ if (settings.links){
       }
       var options = []
       for (var val in filterValues){
-        options.push({'value':filterValues[val],'label':filterValues[val]})
+        options.push({'value':filterValues[val],'label':filterLabels[val]})
       }
       
       if (selectedFilters[filterName]){
@@ -576,9 +590,9 @@ function Filter(props){
     setSelectedFilter(e)
     var filterVals = []
     for (var i=0;i<e.length;i++){
-      filterVals.push(e[i].label)
+      filterVals.push(e[i].value)
     }
-    setField(filterVals)
+    setField(filterName, filterVals)
   }
   function handleFilterChange(e){
     var filterVals = []
