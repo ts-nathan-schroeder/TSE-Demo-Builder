@@ -13,7 +13,9 @@
   }
 }
 
-
+#root{
+  height:100%
+}
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
 
 .App-header {

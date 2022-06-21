@@ -11,3 +11,7 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.whiteinput::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #eeeeee;
+  opacity: 1; /* Firefox */
+}

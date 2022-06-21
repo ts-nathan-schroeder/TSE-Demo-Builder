@@ -11,7 +11,6 @@ function IQVIA() {
         init({
             thoughtSpotHost: 'https://se-thoughtspot-cloud.thoughtspot.cloud/#',
             authType: AuthType.None,
-            customCssUrl: 'cdn.jsdelivr.net/gh/hannsta/TSE-Demo-Builder@iqvia/public/csstest.css'
         });
         setTsVisible(false);
     }, [])
@@ -21,21 +20,21 @@ function IQVIA() {
         setTsVisible(false);
     }                  
     function toggleReport(filterVal){
-        var newSearchString = '[Sales]'
-        newSearchString+=" [Store Region].'"+filterVal+"'"
+        var newSearchString = '[Quarter] [Payment Amount] '
+        newSearchString+=" [State].'"+filterVal+"'"
         setTsVisible(true);
         setSearchString(newSearchString)
     }
     return(
-        <div style={{display:"flex",fontFamily:'Optimo-Plain,Helvetica Neue,Helvetica,Arial,sans-serif'}}>
+        <div style={{height:'100%',display:"flex",fontFamily:'Optimo-Plain,Helvetica Neue,Helvetica,Arial,sans-serif'}}>
             <div style={{flex:1,height:'100%',width:'100%',display:"flex",flexDirection:'column'}}>
 
                 <div style={{flex:1, minHeight:'50px',maxHeight:'50px',display:"flex",flexDirection:'row', backgroundImage:'linear-gradient(to right, #1f084d, #2a6aa6)'}} >
-                    <div style={{flex:1,display:'flex',justifyContent:'flex-start',alignItems:'center'}}> 
-
+                    <div style={{flex:1,display:'flex',width:'50%',justifyContent:'flex-start',alignItems:'center'}}> 
+                        <img style={{filter: 'grayscale(100%) brightness(4.0)'}} src="logo.png" height='100%'/>  
                     </div>
                     <div style={{flex:1,display:'flex',justifyContent:'flex-end',alignItems:'center'}}>
-                        <input style={{border:'1px solid 554378ff', color:'#ffffff', background:'#cccccc99',height:'32px',width:'300px'}} placeholder='Search'>
+                        <input className="whiteinput" style={{border:'1px solid #cccccc', color:'#ffffff', background:'#cccccc99',height:'32px',width:'300px'}} placeholder='Search'>
                         </input>
                         <svg style={{paddingLeft:'20px',paddingRight:'20px', color:'#ffffff'}}  mlns="http://www.w3.org/2000/svg" viewBox="-3 -2 24 24" width="24" fill="currentColor"><path d="M18 17H0a8.978 8.978 0 0 1 3-6.708V6a6 6 0 1 1 12 0v4.292A8.978 8.978 0 0 1 18 17zM6.17 18h5.66a3.001 3.001 0 0 1-5.66 0z"/></svg>
                     </div>
@@ -52,12 +51,12 @@ function IQVIA() {
                             Sales Territory Overview
                         </div>
                     </div>                
-                    <div style={{height:'100vh', display:"flex",flexDirection:'column',flex:1, background:'#f6f7fd',padding:'15px'}}>
+                    <div style={{display:"flex",flexDirection:'column',flex:1, background:'#f6f7fd',padding:'15px'}}>
                         <div>
-                        <div onClick={() => toggleReport('east')} className="hoverer" style={{position:'absolute',marginTop:'calc(15% - 10px)',marginLeft:'20%',width:'300px',height:'5%'}}></div>
-                        <div onClick={() => toggleReport('west')} className="hoverer" style={{position:'absolute',marginTop:'calc(20% - 10px)',marginLeft:'20%',width:'300px',height:'5%'}}></div>
-                        <div onClick={() => toggleReport('south')} className="hoverer" style={{position:'absolute',marginTop:'calc(25% - 10px)',marginLeft:'20%',width:'300px',height:'5%'}}></div>
-                        <div onClick={() => toggleReport('north')} className="hoverer" style={{position:'absolute',marginTop:'calc(30% - 10px)',marginLeft:'20%',width:'300px',height:'5%'}}></div>
+                        <div onClick={() => toggleReport('New York')} className="hoverer" style={{position:'absolute',marginTop:'calc(25% - 10px)',marginLeft:'20%',width:'300px',height:'5%'}}></div>
+                        <div onClick={() => toggleReport('Pennsylvania')} className="hoverer" style={{position:'absolute',marginTop:'calc(30% - 10px)',marginLeft:'20%',width:'300px',height:'5%'}}></div>
+                        <div onClick={() => toggleReport('Deleware')} className="hoverer" style={{position:'absolute',marginTop:'calc(35% - 10px)',marginLeft:'20%',width:'300px',height:'5%'}}></div>
+                        <div onClick={() => toggleReport('Virginia')} className="hoverer" style={{position:'absolute',marginTop:'calc(40% - 10px)',marginLeft:'20%',width:'300px',height:'5%'}}></div>
                         <img src="apollo.png" width='100%'/>
 
                         </div>
@@ -76,7 +75,7 @@ function IQVIA() {
                     <div style={{boxShadow:'0px 0px 55px #636363dd',background:'#f6f8fa'}}>
                             <SearchEmbed       
                                 hideDataSources={true} 
-                                dataSources={['782b50d1-fe89-4fee-812f-b5f9eb0a552d']} 
+                                dataSources={['3049a362-e343-4cb2-8ecd-742d5920e38c']} 
                                 frameParams={{width:'100%',height:'70vh'}}
                                 enabledActions={[]}
                                 searchOptions={{ 
