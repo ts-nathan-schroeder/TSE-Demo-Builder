@@ -370,7 +370,7 @@ function Link(props){
       'Liveboard':'GUID of Liveboard|disableAction=Action.Share|disableAction=Action.Save',
       'Answer': 'GUID of Answer|disableAction=Action.Share|disableAction=Action.Save',
       'Filter':'Comma seperated list of filter values',
-      'Field':'Comma seperated list of field names',
+      'Field':'TML Search Object:Display Value,[region]:Region,[region].east:East',
       'Search String':'[tml] [search] [query] |WorksheetGUID',
       'URL':'URL of website or image'
     }
