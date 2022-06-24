@@ -15,7 +15,8 @@
      "654fb368-08d1-49a9-bbf9-7ca6a9c892a6",
      "d19b4b64-590f-4e34-81e4-abf1a2d48789",
      "35037f69-0f28-4f4c-9afe-9a7fe200155f",
-     "e1b1077b-e1ff-4a59-80c1-8f2e8c8e2632"
+     "e1b1077b-e1ff-4a59-80c1-8f2e8c8e2632",
+     "4dbfec1b-729e-4f80-99ee-e95e9b4a5ce0"
    ],
    "linkTypes": {
      "0": "App",
@@ -31,7 +32,8 @@
      "654fb368-08d1-49a9-bbf9-7ca6a9c892a6": "URL",
      "d19b4b64-590f-4e34-81e4-abf1a2d48789": "Liveboard",
      "35037f69-0f28-4f4c-9afe-9a7fe200155f": "Search String",
-     "e1b1077b-e1ff-4a59-80c1-8f2e8c8e2632": "Filter"
+     "e1b1077b-e1ff-4a59-80c1-8f2e8c8e2632": "Filter",
+     "4dbfec1b-729e-4f80-99ee-e95e9b4a5ce0": "Field"
    },
    "linkNames": {
      "0": "Home",
@@ -47,7 +49,8 @@
      "654fb368-08d1-49a9-bbf9-7ca6a9c892a6": "Admin",
      "d19b4b64-590f-4e34-81e4-abf1a2d48789": "User Adoption",
      "35037f69-0f28-4f4c-9afe-9a7fe200155f": "Credit Usage",
-     "e1b1077b-e1ff-4a59-80c1-8f2e8c8e2632": "Event Category"
+     "e1b1077b-e1ff-4a59-80c1-8f2e8c8e2632": "Event Category",
+     "4dbfec1b-729e-4f80-99ee-e95e9b4a5ce0": "Usage Fields"
    },
    "linkContents": {
      "0": "home",
@@ -58,8 +61,9 @@
      "7645a0f8-cccd-43bc-ad3c-7d21f586457d": "https://se-thoughtspot-cloud.thoughtspot.cloud/#/monitor",
      "654fb368-08d1-49a9-bbf9-7ca6a9c892a6": "https://se-thoughtspot-cloud.thoughtspot.cloud/#/admin",
      "d19b4b64-590f-4e34-81e4-abf1a2d48789": "bea79810-145f-4ad0-a02c-4177a6e7d861",
-     "35037f69-0f28-4f4c-9afe-9a7fe200155f": "[Timestamp] [Timestamp].detailed [Username] [API] [Credit Window ID] [Event Category] [Capped Credit Usage] [Uncapped Credit Usage] sort by [Timestamp] [Timestamp].detailed 'last 12 months' [Username] = 'tsadmin'|965b5f46-7162-4c16-8aac-7ab26f313b25",
-     "e1b1077b-e1ff-4a59-80c1-8f2e8c8e2632": "admin,Answer,Data,Other,Pinboard,Search,SpotIQ"
+     "35037f69-0f28-4f4c-9afe-9a7fe200155f": "[Timestamp].daily [Event Category] [Uncapped Credit Usage] sort by [Timestamp] 'last 12 months' |965b5f46-7162-4c16-8aac-7ab26f313b25",
+     "e1b1077b-e1ff-4a59-80c1-8f2e8c8e2632": "admin,Answer,Data,Other,Pinboard,Search,SpotIQ",
+     "4dbfec1b-729e-4f80-99ee-e95e9b4a5ce0": "[Timestamp].detailed:Detailed Time,[API]:API Call,[Username]:Username,[Credit Window ID]:Credit Window,[Capped Credit Usage]:Capped Credit Usage"
    },
    "linkParents": {
      "4": "Answers",
@@ -70,7 +74,8 @@
      "654fb368-08d1-49a9-bbf9-7ca6a9c892a6": "Workbench",
      "d19b4b64-590f-4e34-81e4-abf1a2d48789": "Workbench",
      "35037f69-0f28-4f4c-9afe-9a7fe200155f": "Workbench",
-     "e1b1077b-e1ff-4a59-80c1-8f2e8c8e2632": "Credit Usage"
+     "e1b1077b-e1ff-4a59-80c1-8f2e8c8e2632": "Credit Usage",
+     "4dbfec1b-729e-4f80-99ee-e95e9b4a5ce0": "Credit Usage"
    },
    "primaryColor": "#3C6EE7",
    "secondaryColor": "#f3f6fa",
