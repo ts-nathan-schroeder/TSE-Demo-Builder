@@ -366,11 +366,11 @@ function Link(props){
     contentInput = null;
   }else{
     var placeholders = {
-      'Search': 'GUID of Worksheet|disableAction=Action.Share|disableAction=Action.Save',
-      'Liveboard':'GUID of Liveboard|disableAction=Action.Share|disableAction=Action.Save',
-      'Answer': 'GUID of Answer|disableAction=Action.Share|disableAction=Action.Save',
-      'Filter':'Comma seperated list of filter values',
-      'Field':'TML Search Object:Display Value,[region]:Region,[region].east:East',
+      'Search': 'WorksheetGUID|disableAction=Action.Share|disableAction=Action.Save',
+      'Liveboard':'LiveboardGUID|disableAction=Action.Share|disableAction=Action.Save',
+      'Answer': 'AnswerGUID|disableAction=Action.Share|disableAction=Action.Save',
+      'Filter':'East,West,South,North',
+      'Field':'[Region]:Region,[Timestamp].detailed:Detailed Time',
       'Search String':'[tml] [search] [query] |WorksheetGUID',
       'URL':'URL of website or image'
     }
