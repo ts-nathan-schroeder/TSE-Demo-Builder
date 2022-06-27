@@ -32,6 +32,11 @@ const [logoImage, setLogoImage] = useState('')
 const [displayPrimaryPicker, setDisplayPrimaryPicker] = useState('')
 const [displaySecondaryPicker, setDisplaySecondaryPicker] = useState('')
 
+useEffect(()=>{
+  var objDiv = document.getElementById("linkContainer");
+  objDiv.scrollTop = objDiv.scrollHeight + 30;
+})
+
 function updatePrimaryColor(color){
   setPrimaryColor(color.hex);
 };
@@ -59,6 +64,7 @@ const addLink = () =>{
   setLinkContents({ ...linkContents, [uuid]: undefined });
   setLinkParents({ ...linkParents, [uuid]: undefined });
   setLinkTypes({ ...linkTypes, [uuid]: 'None' });
+  
 }
 const removeLink = (id) =>{
   setLinks(links.filter((e)=>(e !== id)))
@@ -301,7 +307,7 @@ return (
     <div className='linkHeader'>
         <div style={{width:'110px'}}>Name</div><div style={{width:'90px'}}>Type</div><div style={{flex:1}}>Configuration</div><div style={{width:'160px'}}>Parent</div>
       </div>
-    <div className="linkContainer">
+    <div id="linkContainer" className="linkContainer">
 
       <div>
       {linkObjs}
