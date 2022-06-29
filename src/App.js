@@ -24,6 +24,16 @@ function App() {
     setSettings(settings)
     setTimeKey(Date.now());
   }
+  function deleteAllCookies() {
+    var cookies = document.cookie.split(";");
+
+    for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i];
+        var eqPos = cookie.indexOf("=");
+        var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    }
+  } 
   function saveSettings(settings){
     var a = document.getElementById("saveButton");
     var file = new Blob([JSON.stringify(settings)], {type: 'json'});
@@ -60,10 +70,11 @@ function App() {
   const popover = {
     position: 'absolute',
     zIndex: '2',
-    top:50,
-    left:300,
-    width:'600px',
-    height:'700px',
+    top:'5%',
+    left:'25%',
+    width:'70%',
+    minWidth:'600px',
+    height:'85%',
     background:'#ffffff',
     boxShadow: '0px 0px 250px #ededed',
     padding:'25px'

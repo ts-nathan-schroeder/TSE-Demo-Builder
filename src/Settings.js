@@ -32,6 +32,11 @@ const [logoImage, setLogoImage] = useState('')
 const [displayPrimaryPicker, setDisplayPrimaryPicker] = useState('')
 const [displaySecondaryPicker, setDisplaySecondaryPicker] = useState('')
 
+useEffect(()=>{
+  var objDiv = document.getElementById("linkContainer");
+  objDiv.scrollTop = objDiv.scrollHeight + 30;
+})
+
 function updatePrimaryColor(color){
   setPrimaryColor(color.hex);
 };
@@ -58,7 +63,8 @@ const addLink = () =>{
   setLinkNames({ ...linkNames, [uuid]: undefined });
   setLinkContents({ ...linkContents, [uuid]: undefined });
   setLinkParents({ ...linkParents, [uuid]: undefined });
-  setLinkTypes({ ...linkTypes, [uuid]: undefined });
+  setLinkTypes({ ...linkTypes, [uuid]: 'None' });
+  
 }
 const removeLink = (id) =>{
   setLinks(links.filter((e)=>(e !== id)))
@@ -147,6 +153,18 @@ if (!links){
       activeMenus.push(linkNames[link])
     }
   }
+  var activeReports = []
+  for (var link of links){
+    if (linkTypes[link]=='Liveboard' || linkTypes[link]=='Search String'){
+      activeReports.push(linkNames[link])
+    }
+  }
+  var activeSearchStrings = []
+  for (var link of links){
+    if (linkTypes[link]=='Search String'){
+      activeSearchStrings.push(linkNames[link])
+    }
+  }
   var linkObjs   = links.map(link => (
     <Link
       key={link}
@@ -160,6 +178,8 @@ if (!links){
       content={linkContents[link]}
       parent={linkParents[link]}
       linkNames={activeMenus}
+      activeReports={activeReports}
+      activeSearchStrings={activeSearchStrings}
       removeLink={removeLink}
       moveDown={moveDown}
       moveUp={moveUp}
@@ -239,7 +259,7 @@ return (
     <div className="settingLabel">Settings Name</div> 
     <input type="text" value={name} onChange={e => setName(e.target.value)}></input>
     <div className="settingLabel">Thoughtspot URL</div> 
-    <input style={{width:'500px',height:'30px'}} type="text" value={URL} onChange={e => setURL(e.target.value)}></input>
+    <input  type="text" value={URL} onChange={e => setURL(e.target.value)}></input>
     
     <div className="horizontalMenu">
       <div className="verticalMenu">
@@ -284,13 +304,17 @@ return (
     
 
     <div className="settingLabel">Links</div> 
-    <div className="linkContainer">
-      <div className='linkHeader'>
-        <div style={{width:'110px'}}>Name</div><div style={{width:'90px'}}>Type</div><div style={{width:'240px'}}>Configuration</div><div>Parent</div>
+    <div className='linkHeader'>
+        <div style={{width:'110px'}}>Name</div><div style={{width:'90px'}}>Type</div><div style={{flex:1}}>Configuration</div><div style={{width:'160px'}}>Parent</div>
       </div>
+    <div id="linkContainer" className="linkContainer">
+
+      <div>
       {linkObjs}
+
+      </div>
     </div>
-    <div className="button" onClick={addLink}>
+    <div className="button addLink" onClick={addLink}>
       <PlusIcon />
       Add Link
     </div>
@@ -312,6 +336,8 @@ function Link(props){
     saveLinkContent,
     saveLinkParent,
     linkNames,
+    activeReports,
+    activeSearchStrings,
     removeLink,
     moveDown,
     moveUp,
@@ -334,7 +360,7 @@ function Link(props){
   if (type=='Menu'){
     contentInput = null;
   }else if (type=='App'){
-    contentInput = <select style={{width:'250px',marginRight:'5px'}} onChange={e => handleContentChange(e.target.value)} value={content}> 
+    contentInput = <select style={{flex:1,marginRight:'5px'}} onChange={e => handleContentChange(e.target.value)} value={content}> 
       <option value="home">Home</option>
       <option value="answers">Answers</option>
       <option value="pinboards">Liveboards</option>
@@ -345,25 +371,55 @@ function Link(props){
   else if (type=="None"){
     contentInput = null;
   }else{
-    contentInput = <input style={{width:'250px',marginRight:'5px'}} value={content} onChange={e => handleContentChange(e.target.value)} />;
+    var placeholders = {
+      'Search': 'WorksheetGUID|disableAction=Action.Share|disableAction=Action.Save',
+      'Liveboard':'LiveboardGUID|disableAction=Action.Share|disableAction=Action.Save',
+      'Answer': 'AnswerGUID|disableAction=Action.Share|disableAction=Action.Save',
+      'Filter':'East,West,South,North',
+      'Field':'[Region]:Region,[Timestamp].detailed:Detailed Time',
+      'Search String':'[tml] [search] [query] |WorksheetGUID',
+      'URL':'URL of website or image'
+    }
+    contentInput = <input style={{flex:1,border:'1px solid #cccccccc', borderRadius:'5px', marginRight:'5px'}} placeholder={placeholders[type]} value={content} onChange={e => handleContentChange(e.target.value)} />;
   }
 
   var parentOptions = []
-  for (var link of Object.values(linkNames)){
+  var parentOptionLinks = linkNames
+  if (type=='Filter'){
+    parentOptionLinks = activeReports;
+  }
+  if (type=='Field'){
+    parentOptionLinks = activeSearchStrings;
+  }
+  for (var link of Object.values(parentOptionLinks)){
     parentOptions.push(<option value={link}>{link}</option>)
   }
-
+  var namePlaceholders = {
+    'Search': 'Link Name',
+    'Liveboard': 'Link Name',
+    'Answer': 'Link Name',
+    'Filter': 'Column Name',
+    'Field': 'Column Name',
+    'Search String':'Link Name',
+    'URL':'Link Name',
+    'App': 'Link Name',
+    'Menu': 'Menu Name',
+    'None':'Link Name'
+  }
   return(
     <div className="link">
-      <input style={{width:'100px',marginRight:'5px'}} value={name} onChange={e => handleNameChange(e.target.value)} />
+      <input placeholder={namePlaceholders[type]} style={{width:'100px',marginRight:'5px'}} value={name} onChange={e => handleNameChange(e.target.value)} />
       <select style={{width:'80px',marginRight:'5px'}} onChange={e => handleTypeChange(e.target.value)} value={type}> 
         <option value="None">None</option>
+        <option value="Menu">Menu</option>
         <option value="Search">Search</option>
         <option value="Liveboard">Liveboard</option>
         <option value="Answer">Answer</option>
         <option value="App">Full App</option>
         <option value="URL">URL</option>
-        <option value="Menu">Menu</option>
+        <option value="Search String">Search String</option>
+        <option value="Filter">Filter (Liveboard & Search String)</option>
+        <option value="Field">Field (Search String)</option>
       </select>
       {contentInput}
       {(type!='Menu') ? 
