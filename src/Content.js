@@ -2,6 +2,7 @@ import React, { useState, useEffect, setState } from 'react';
 import { init,  AuthType, Page, EmbedEvent, Action, HostEvent} from '@thoughtspot/visual-embed-sdk';
 import { SearchEmbed, LiveboardEmbed, AppEmbed, useEmbedRef } from '@thoughtspot/visual-embed-sdk/react';
 import { MultiSelect } from "react-multi-select-component";
+import NotePopup from './NotePopup';
 
 function Content(props) {
 const {
@@ -19,6 +20,16 @@ const [filterKey, setFilterKey] = useState('')
 const [renderKey, setRenderKey] = useState('')
 const [searchFields , setSearchFields] = useState('')
 const embedRef = useEmbedRef();
+const [popupVisible, setPopupVisible] = useState('')
+const [popupConfig, setPopupConfig] = useState('')
+const [token,setToken]=useState('')
+const [userContent,setUserContent] = useState('')
+
+const MemorizedSearchEmbed = React.memo(SearchEmbed);
+
+function togglePopupVisible(){
+  setPopupVisible(!popupVisible)
+}
 
 useEffect(() => {
   if (settings.URL){
@@ -31,6 +42,9 @@ useEffect(() => {
     }
     catch(err){
       alert("could not connect to thoughtspot")
+    }
+    if (settings.username){
+      getToken()
     }
   }
   var defaultFilters = {}
@@ -122,6 +136,44 @@ function setField(key,fields){
   setSearchFields({ ...searchFields, [key]: fields });
 
 }
+function getToken(){
+  if (!token){
+      var body = JSON.stringify({"userName":settings.username,"password":settings.password})
+      fetch(settings.URL+"tspublic/rest/v2/session/gettoken",{
+          method:'POST',
+          body:body,
+          headers:{
+            'Accept':'application/json',
+            'Content-Type': 'application/json' 
+          }
+      }).then(response => response.json()).then(
+          data => {
+            setToken(data.token)
+            getUserContent(data.token)
+          }
+      )
+  }
+}
+function getUserContent(authToken){
+  if (authToken){
+    var body = JSON.stringify({"type":"ANSWER",  "sortBy": "LAST_ACCESSED",
+    "batchSize": 10})
+    fetch(settings.URL+"tspublic/rest/v2/metadata/header/search",{
+        method:'POST',
+        body:body,
+        headers:{
+          'Authorization': 'Bearer '+authToken,
+          'Accept':'application/json',
+          'Content-Type': 'application/json' 
+        }
+    }).then(response => response.json()).then(
+        data => {
+          setUserContent(data.headers)
+        }
+    )
+}
+}
+
 function setFilter(newFilterObj){
   var filterObjs = runFilters;
   var found = false;
@@ -149,6 +201,11 @@ function setFilter(newFilterObj){
 
 }
 function onEmbedRendered(){
+  embedRef.current.on(EmbedEvent.VizPointDoubleClick, (data) => {
+      console.log('>>> called', data);
+      const event = new CustomEvent('popup', {detail: {data: data}});
+      window.dispatchEvent(event)
+  })
   embedRef.current.on(EmbedEvent.CustomAction, (payload) => {
     
     var data = payload.data.embedAnswerData.data[0].columnDataLite
@@ -159,6 +216,7 @@ function onEmbedRendered(){
     alert(alertString);
   })
 }
+
 var isHorizontal = (settings.orientation=='Horizontal') 
 
 if (settings.links){
@@ -171,6 +229,22 @@ if (settings.links){
   }
   for (var link of topLevel){
     var childrenLinks = []
+    if (settings.linkTypes[link]=='Rest' && userContent){
+      for (var contentItem of userContent){
+        childrenLinks.push(
+          <LinkContainer
+          key={contentItem.id}
+          id={contentItem.id}
+          name={contentItem.name}
+          content={contentItem.id}
+          type="Answer"
+          renderLink={renderLink}
+          isHorizontal={isHorizontal}
+        />
+        )       
+      }
+    }
+
     for (var child of settings.links){
       if (settings.linkParents[child]==settings.linkNames[link]){
         childrenLinks.push(
@@ -264,6 +338,9 @@ if (!isHorizontal){
   document.documentElement.style.setProperty('--dropdown-container-right-margin', '0px');
   document.documentElement.style.setProperty('--dropdown-container-bottom-margin', '10px');
   document.documentElement.style.setProperty('--dropdown-left-margin', '130px');
+  
+  document.documentElement.style.setProperty('--dropdown-top-margin', '-240px');
+
   document.documentElement.style.setProperty('--dropdown-top-margin', '-240px');
   document.documentElement.style.setProperty('--dropdown-max-height', '240px');
 
@@ -314,7 +391,7 @@ if (renderType=='Search'){
   if (renderContent && renderContent.length>0){
     renderContents = renderContent.split("|")[0].split(",")
   }
-  renderPage = <SearchEmbed 
+  renderPage = <MemorizedSearchEmbed 
       enabledActions={enabledActions.length>0 ? enabledActions : null} 
       disabledActions={disabledActions.length>0 ? disabledActions : null} 
       dataSources={renderContents} 
@@ -335,7 +412,7 @@ if (renderType=='Liveboard'){
   />
 }
 if (renderType=='Answer'){
-  renderPage = <SearchEmbed ref={embedRef} 
+  renderPage = <MemorizedSearchEmbed ref={embedRef} 
       enabledActions={enabledActions.length>0 ? enabledActions : null} 
       disabledActions={disabledActions.length>0 ? disabledActions : null}  
       onLoad={onEmbedRendered}  
@@ -380,7 +457,9 @@ return (
         <div style={isHorizontal ? logoImageHolderHorizontal: logoImageHolderVertical}>
           <img src={settings.logoImage} style={isHorizontal ? horizontalLogoImage : verticalLogoImage}></img>
         </div>
-
+        <div>
+        <NotePopup  popupVisible={popupVisible} togglePopupVisible={togglePopupVisible} popupConfig={popupConfig} primaryColor={settings.primaryColor} secondaryColor={settings.secondaryColor}></NotePopup> 
+      </div>
         {linkContainers}
         <div style={isHorizontal ? horizontalIcons : verticalIcons}>
           {!isHorizontal ? <div style={{margin:'10px',}}>

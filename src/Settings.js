@@ -31,6 +31,9 @@ const [orientation, setOrientation] = useState('')
 const [logoImage, setLogoImage] = useState('')
 const [displayPrimaryPicker, setDisplayPrimaryPicker] = useState('')
 const [displaySecondaryPicker, setDisplaySecondaryPicker] = useState('')
+const [advancedVisible,setAdvancedVisible] = useState('')
+const [username,setUsername] = useState('')
+const [password, setPassword] = useState('')
 
 useEffect(()=>{
   var objDiv = document.getElementById("linkContainer");
@@ -44,7 +47,9 @@ function updateSecondaryColor(color){
   setSecondaryColor(color.hex);
 };
 
-
+function toggleAdvancedVisible(){
+  setAdvancedVisible(!advancedVisible)
+}
 const handleLinkTypeChange = (linkId, value) => {
   setLinkTypes({ ...linkTypes, [linkId]: value });
 };
@@ -107,7 +112,9 @@ const getSettingsObj = () =>{
     primaryColor: primaryColor,
     secondaryColor: secondaryColor,
     orientation: orientation,
-    logoImage: logoImage
+    logoImage: logoImage,
+    username: username,
+    password: password
   }
   return settings;
 }
@@ -130,6 +137,8 @@ useEffect(() => {
     setSecondaryColor(settings.secondaryColor)
     setOrientation(settings.orientation)
     setLogoImage(settings.logoImage)
+    setPassword(settings.password)
+    setUsername(settings.username)
   }
 }, [])
 const popover = {
@@ -258,7 +267,7 @@ return (
     </div>
     <div className="settingLabel">Settings Name</div> 
     <input type="text" value={name} onChange={e => setName(e.target.value)}></input>
-    <div className="settingLabel">Thoughtspot URL</div> 
+    <div className="settingLabel">ThoughtSpot URL</div> 
     <input  type="text" value={URL} onChange={e => setURL(e.target.value)}></input>
     
     <div className="horizontalMenu">
@@ -314,11 +323,23 @@ return (
 
       </div>
     </div>
+    <div style={{display:'flex',flexDirection:'row'}}>
     <div className="button addLink" onClick={addLink}>
       <PlusIcon />
       Add Link
     </div>
-
+    <div className="button addLink"  onClick={toggleAdvancedVisible}>
+       Advanced
+    </div>
+    </div>
+    {advancedVisible ? 
+      <div style={{display:'flex',flexDirection:'column'}}>
+      <div className="settingLabel">ThoughtSpot Username</div> 
+      <input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
+      <div className="settingLabel">ThoughtSpot Password</div> 
+      <input type="password" placeholder="Password"  value={password} onChange={e => setPassword(e.target.value)} />
+      </div>
+   : null}
   </div>
 )
 }
@@ -420,9 +441,10 @@ function Link(props){
         <option value="Search String">Search String</option>
         <option value="Filter">Filter (Liveboard & Search String)</option>
         <option value="Field">Field (Search String)</option>
+        <option value="Rest">REST Content List</option>
       </select>
       {contentInput}
-      {(type!='Menu') ? 
+      {(type!='Menu' && type!='Rest') ? 
         <select style={{width:'80px',marginRight:'5px'}} onChange={e => handleParentChange(e.target.value)} value={parent}> 
           <option value="None">None</option>
           {parentOptions}
