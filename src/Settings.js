@@ -31,9 +31,7 @@ const [orientation, setOrientation] = useState('')
 const [logoImage, setLogoImage] = useState('')
 const [displayPrimaryPicker, setDisplayPrimaryPicker] = useState('')
 const [displaySecondaryPicker, setDisplaySecondaryPicker] = useState('')
-const [advancedVisible,setAdvancedVisible] = useState('')
-const [username,setUsername] = useState('')
-const [password, setPassword] = useState('')
+
 
 useEffect(()=>{
   var objDiv = document.getElementById("linkContainer");
@@ -47,9 +45,7 @@ function updateSecondaryColor(color){
   setSecondaryColor(color.hex);
 };
 
-function toggleAdvancedVisible(){
-  setAdvancedVisible(!advancedVisible)
-}
+
 const handleLinkTypeChange = (linkId, value) => {
   setLinkTypes({ ...linkTypes, [linkId]: value });
 };
@@ -112,9 +108,7 @@ const getSettingsObj = () =>{
     primaryColor: primaryColor,
     secondaryColor: secondaryColor,
     orientation: orientation,
-    logoImage: logoImage,
-    username: username,
-    password: password
+    logoImage: logoImage
   }
   return settings;
 }
@@ -137,8 +131,6 @@ useEffect(() => {
     setSecondaryColor(settings.secondaryColor)
     setOrientation(settings.orientation)
     setLogoImage(settings.logoImage)
-    setPassword(settings.password)
-    setUsername(settings.username)
   }
 }, [])
 const popover = {
@@ -328,18 +320,7 @@ return (
       <PlusIcon />
       Add Link
     </div>
-    <div className="button addLink"  onClick={toggleAdvancedVisible}>
-       Advanced
-    </div>
-    </div>
-    {advancedVisible ? 
-      <div style={{display:'flex',flexDirection:'column'}}>
-      <div className="settingLabel">ThoughtSpot Username</div> 
-      <input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
-      <div className="settingLabel">ThoughtSpot Password</div> 
-      <input type="password" placeholder="Password"  value={password} onChange={e => setPassword(e.target.value)} />
-      </div>
-   : null}
+  </div>
   </div>
 )
 }
@@ -399,7 +380,8 @@ function Link(props){
       'Filter':'East,West,South,North',
       'Field':'[Region]:Region,[Timestamp].detailed:Detailed Time',
       'Search String':'[tml] [search] [query] |WorksheetGUID',
-      'URL':'URL of website or image'
+      'URL':'URL of website or image',
+      'Rest':'tags=Retail Sales|category=my|sort=CREATED|type=liveboard'
     }
     contentInput = <input style={{flex:1,border:'1px solid #cccccccc', borderRadius:'5px', marginRight:'5px'}} placeholder={placeholders[type]} value={content} onChange={e => handleContentChange(e.target.value)} />;
   }
@@ -425,7 +407,8 @@ function Link(props){
     'URL':'Link Name',
     'App': 'Link Name',
     'Menu': 'Menu Name',
-    'None':'Link Name'
+    'None':'Link Name',
+    'Rest':'Link Name'
   }
   return(
     <div className="link">

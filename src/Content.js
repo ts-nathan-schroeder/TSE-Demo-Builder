@@ -23,7 +23,8 @@ const embedRef = useEmbedRef();
 const [popupVisible, setPopupVisible] = useState('')
 const [popupConfig, setPopupConfig] = useState('')
 const [token,setToken]=useState('')
-const [userContent,setUserContent] = useState('')
+const [restLiveboards,setRestLiveboards] = useState('')
+const [restAnswers,setRestAnswers] = useState('')
 
 const MemorizedSearchEmbed = React.memo(SearchEmbed);
 
@@ -44,13 +45,17 @@ useEffect(() => {
       alert("could not connect to thoughtspot")
     }
     if (settings.username){
-      getToken()
+      
+      //getToken()
     }
   }
+
+  //Setup Default Filters && REST Lists
   var defaultFilters = {}
   if (settings.links){
     var filterObjs = []
     var defaultsFound = false;
+    var restConfigs = []
     for (var link of settings.links){
       if (settings.linkTypes[link]=='Filter'){
         var filterContent = settings.linkContents[link].split("|")
@@ -72,8 +77,42 @@ useEffect(() => {
           }
         }
       }
+    
+      if (settings.linkTypes[link]=='Rest'){
+        var type = "all"
+        var restURLParams = "" 
+        var catType = "ALL"
+        var batchsize = 5
+        if (settings.linkContents[link]){
+          var params = settings.linkContents[link].split("|")
+          for (var param of params){
+            var paramKey = param.split("=")[0]
+            var paramVal = param.split("=")[1]
+            if (paramKey=="type"){
+              type = paramVal
+            }
+            if (paramKey=="sort"){
+              restURLParams+="&sort="+paramVal
+            }
+            if (paramKey=="tags"){
+              restURLParams+="&tagname="+encodeURIComponent(JSON.stringify(paramVal.split(",")));
+            }
+            if (paramKey=="category"){
+              catType = paramVal.toUpperCase();
+            } 
+        }    
+        }
+        restURLParams+="&category="+catType+"&batchsize="+batchsize;
+        
+        restConfigs.push({type:type,link:link,restURLParams:restURLParams})
+      }
     }
+    if (restConfigs.length>0){
+      getUserContentv1(restConfigs)
+    }
+
   }
+
   if (defaultsFound){
     setRunFilters(filterObjs);
     setSelectedFilters(defaultFilters)
@@ -136,42 +175,44 @@ function setField(key,fields){
   setSearchFields({ ...searchFields, [key]: fields });
 
 }
-function getToken(){
-  if (!token){
-      var body = JSON.stringify({"userName":settings.username,"password":settings.password})
-      fetch(settings.URL+"tspublic/rest/v2/session/gettoken",{
-          method:'POST',
-          body:body,
-          headers:{
-            'Accept':'application/json',
-            'Content-Type': 'application/json' 
-          }
-      }).then(response => response.json()).then(
-          data => {
-            setToken(data.token)
-            getUserContent(data.token)
-          }
-      )
+
+async function getUserContentv1(configs){
+  //type,link,restURLParams
+  var restAnswersCopy = {}
+  var restLiveboardsCopy = {}
+  for (var config of configs){
+    if (config.type=='all' || config.type=='liveboard'){
+      var liveboards = await getLiveboards(config.restURLParams);
+    }
+    if (config.type=='all' || config.type=='answer'){
+      var answers = await getAnswers(config.restURLParams)
+    }
+    if (liveboards.length>0){
+      restLiveboardsCopy[config.link] = liveboards 
+    }
+    if (answers.length>0){
+      restAnswersCopy[config.link] = answers
+    }
   }
+  setRestLiveboards(restLiveboardsCopy)
+  setRestAnswers(restAnswersCopy)
+  
 }
-function getUserContent(authToken){
-  if (authToken){
-    var body = JSON.stringify({"type":"ANSWER",  "sortBy": "LAST_ACCESSED",
-    "batchSize": 10})
-    fetch(settings.URL+"tspublic/rest/v2/metadata/header/search",{
-        method:'POST',
-        body:body,
-        headers:{
-          'Authorization': 'Bearer '+authToken,
-          'Accept':'application/json',
-          'Content-Type': 'application/json' 
-        }
-    }).then(response => response.json()).then(
-        data => {
-          setUserContent(data.headers)
-        }
-    )
+async function getLiveboards(restURLParams){
+  return await fetch(settings.URL+"callosum/v1/tspublic/v1/metadata/list?type=PINBOARD_ANSWER_BOOK"+restURLParams,
+  {
+    credentials: 'include',
+  })
+  .then(response => response.json()).then(
+    data => data.headers)
 }
+async function getAnswers(restURLParams){
+  return await fetch(settings.URL+"callosum/v1/tspublic/v1/metadata/list?type=QUESTION_ANSWER_BOOK"+restURLParams,
+  {
+    credentials: 'include',
+  })
+  .then(response => response.json()).then(
+    data => data.headers)
 }
 
 function setFilter(newFilterObj){
@@ -206,6 +247,9 @@ function onEmbedRendered(){
       const event = new CustomEvent('popup', {detail: {data: data}});
       window.dispatchEvent(event)
   })
+  embedRef.current.on(EmbedEvent.VizPointClick, (data) => {
+    console.log('single click');
+  })
   embedRef.current.on(EmbedEvent.CustomAction, (payload) => {
     
     var data = payload.data.embedAnswerData.data[0].columnDataLite
@@ -229,8 +273,9 @@ if (settings.links){
   }
   for (var link of topLevel){
     var childrenLinks = []
-    if (settings.linkTypes[link]=='Rest' && userContent){
-      for (var contentItem of userContent){
+    console.log("rest answers",restAnswers,restLiveboards)
+    if (settings.linkTypes[link]=='Rest' && restAnswers && restAnswers[link]){
+      for (var contentItem of restAnswers[link]){
         childrenLinks.push(
           <LinkContainer
           key={contentItem.id}
@@ -244,7 +289,21 @@ if (settings.links){
         )       
       }
     }
-
+    if (settings.linkTypes[link]=='Rest' && restLiveboards && restLiveboards[link]){
+      for (var contentItem of restLiveboards[link]){
+        childrenLinks.push(
+          <LinkContainer
+          key={contentItem.id}
+          id={contentItem.id}
+          name={contentItem.name}
+          content={contentItem.id}
+          type="Liveboard"
+          renderLink={renderLink}
+          isHorizontal={isHorizontal}
+        />
+        )       
+      }
+    }
     for (var child of settings.links){
       if (settings.linkParents[child]==settings.linkNames[link]){
         childrenLinks.push(
@@ -338,9 +397,7 @@ if (!isHorizontal){
   document.documentElement.style.setProperty('--dropdown-container-right-margin', '0px');
   document.documentElement.style.setProperty('--dropdown-container-bottom-margin', '10px');
   document.documentElement.style.setProperty('--dropdown-left-margin', '130px');
-  
   document.documentElement.style.setProperty('--dropdown-top-margin', '-240px');
-
   document.documentElement.style.setProperty('--dropdown-top-margin', '-240px');
   document.documentElement.style.setProperty('--dropdown-max-height', '240px');
 
@@ -645,7 +702,8 @@ const hoverMenuHorizontal ={
 }
 const hoverMenuVertical = {
   position: 'absolute',
-  width: '150px',
+  width: '200px',
+  paddingRight:'10px',
   left: '150px',
   marginTop:'-29px',
 }
