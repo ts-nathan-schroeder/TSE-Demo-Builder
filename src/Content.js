@@ -50,12 +50,16 @@ useEffect(() => {
     }
   }
 
-  //Setup Default Filters && REST Lists
+  loadDefaultFilters();
+  loadRestContent();
+
+
+}, [])
+function loadDefaultFilters(){
   var defaultFilters = {}
   if (settings.links){
     var filterObjs = []
     var defaultsFound = false;
-    var restConfigs = []
     for (var link of settings.links){
       if (settings.linkTypes[link]=='Filter'){
         var filterContent = settings.linkContents[link].split("|")
@@ -77,50 +81,15 @@ useEffect(() => {
           }
         }
       }
-    
-      if (settings.linkTypes[link]=='Rest'){
-        var type = "all"
-        var restURLParams = "" 
-        var catType = "ALL"
-        var batchsize = 5
-        if (settings.linkContents[link]){
-          var params = settings.linkContents[link].split("|")
-          for (var param of params){
-            var paramKey = param.split("=")[0]
-            var paramVal = param.split("=")[1]
-            if (paramKey=="type"){
-              type = paramVal
-            }
-            if (paramKey=="sort"){
-              restURLParams+="&sort="+paramVal
-            }
-            if (paramKey=="tags"){
-              restURLParams+="&tagname="+encodeURIComponent(JSON.stringify(paramVal.split(",")));
-            }
-            if (paramKey=="category"){
-              catType = paramVal.toUpperCase();
-            } 
-        }    
-        }
-        restURLParams+="&category="+catType+"&batchsize="+batchsize;
-        
-        restConfigs.push({type:type,link:link,restURLParams:restURLParams})
-      }
     }
-    if (restConfigs.length>0){
-      getUserContentv1(restConfigs)
-    }
-
   }
-
   if (defaultsFound){
     setRunFilters(filterObjs);
     setSelectedFilters(defaultFilters)
   } 
   if (!runFilters && !defaultsFound) setRunFilters([])
   if (!selectedFilters && !defaultsFound)  setSelectedFilters({})
-}, [])
-
+}
 function renderLink(type,content,name){
   setRenderContent(content);
   setRenderType(type);
@@ -152,7 +121,6 @@ function buildSearchString(searchingFields,filteringFields){
     } 
     }
   }
-
   if (filteringFields){
     for (var filter of filteringFields){
       var filterVals = filter.values
@@ -167,36 +135,67 @@ function buildSearchString(searchingFields,filteringFields){
 
 
 function setField(key,fields){
-  // embedRef.current.trigger(HostEvent.Search, {
+    // embedRef.current.trigger(HostEvent.Search, {
   //   searchQuery: buildSearchString(fields, null),
   //   executeSearch: true,
 
   // });
   setSearchFields({ ...searchFields, [key]: fields });
-
 }
-
-async function getUserContentv1(configs){
-  //type,link,restURLParams
-  var restAnswersCopy = {}
-  var restLiveboardsCopy = {}
-  for (var config of configs){
-    if (config.type=='all' || config.type=='liveboard'){
-      var liveboards = await getLiveboards(config.restURLParams);
-    }
-    if (config.type=='all' || config.type=='answer'){
-      var answers = await getAnswers(config.restURLParams)
-    }
-    if (liveboards.length>0){
-      restLiveboardsCopy[config.link] = liveboards 
-    }
-    if (answers.length>0){
-      restAnswersCopy[config.link] = answers
+// =============
+// REST CONTENT
+// =============
+async function loadRestContent(){
+  var restConfigs = []
+  for (var link of settings.links){
+    if (settings.linkTypes[link]=='Rest'){
+      var type = "all"
+      var restURLParams = "" 
+      var catType = "ALL"
+      var batchsize = 5
+      if (settings.linkContents[link]){
+        var params = settings.linkContents[link].split("|")
+        for (var param of params){
+          var paramKey = param.split("=")[0]
+          var paramVal = param.split("=")[1]
+          if (paramKey=="type"){
+            type = paramVal
+          }
+          if (paramKey=="sort"){
+            restURLParams+="&sort="+paramVal
+          }
+          if (paramKey=="tags"){
+            restURLParams+="&tagname="+encodeURIComponent(JSON.stringify(paramVal.split(",")));
+          }
+          if (paramKey=="category"){
+            catType = paramVal.toUpperCase();
+          } 
+      }    
+      }
+      restURLParams+="&category="+catType+"&batchsize="+batchsize;
+      restConfigs.push({type:type,link:link,restURLParams:restURLParams})
     }
   }
-  setRestLiveboards(restLiveboardsCopy)
-  setRestAnswers(restAnswersCopy)
-  
+  if (restConfigs.length>0){
+    var restAnswersCopy = {}
+    var restLiveboardsCopy = {}
+    for (var config of restConfigs){
+      if (config.type=='all' || config.type=='liveboard'){
+        var liveboards = await getLiveboards(config.restURLParams);
+      }
+      if (config.type=='all' || config.type=='answer'){
+        var answers = await getAnswers(config.restURLParams)
+      }
+      if (liveboards.length>0){
+        restLiveboardsCopy[config.link] = liveboards 
+      }
+      if (answers.length>0){
+        restAnswersCopy[config.link] = answers
+      }
+    }
+    setRestLiveboards(restLiveboardsCopy)
+    setRestAnswers(restAnswersCopy)
+  }
 }
 async function getLiveboards(restURLParams){
   return await fetch(settings.URL+"callosum/v1/tspublic/v1/metadata/list?type=PINBOARD_ANSWER_BOOK"+restURLParams,
@@ -234,7 +233,6 @@ function setFilter(newFilterObj){
   }else{
     setRunFilters(filterObjs);
     setRenderKey(Date.now())
-
     // embedRef.current.trigger(HostEvent.Search, {
     //   searchQuery: buildSearchString(null,filterObjs)
     // });
@@ -242,6 +240,14 @@ function setFilter(newFilterObj){
 
 }
 function onEmbedRendered(){
+  embedRef.current.on(EmbedEvent.MakeACopy,(data) => {
+    console.log("copy!")
+    //loadRestContent();
+  })
+  embedRef.current.on(EmbedEvent.Save,(data) => {
+    console.log("save!")
+    //loadRestContent();
+  })
   embedRef.current.on(EmbedEvent.VizPointDoubleClick, (data) => {
       console.log('>>> called', data);
       const event = new CustomEvent('popup', {detail: {data: data}});
@@ -384,7 +390,6 @@ if (settings.links){
 }
 
 //Set primary CSS variables for page
-
 document.documentElement.style.setProperty('--primary-color', settings.primaryColor);
 document.documentElement.style.setProperty('--secondary-color', settings.secondaryColor);
 
@@ -411,7 +416,6 @@ if (!isHorizontal){
   document.documentElement.style.setProperty('--dropdown-left-margin', '0px');
   document.documentElement.style.setProperty('--dropdown-top-margin', '0px');
   document.documentElement.style.setProperty('--dropdown-max-height', '500px');
-
 }
 
 var enabledActions = []
