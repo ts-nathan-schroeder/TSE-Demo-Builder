@@ -74,6 +74,8 @@ This is what will be displayed in the nav menu
 | Filter| This attaches a custom filter to a Liveboard or Search String embed, that can be used to supply runtime filter values.  | The Name of the filter should be your column name. The configuration section contains a comma seperated list of possible values for that filter |
 | Search String | This will render a search embed with a specific search string. | The first part contains the TML searech - eg: [sales] [state]. The second part contains the GUUID of a datasource. These need to be seperated by a vertical bar "|". |
 | REST Content List | This will create a dropdown menu, prepopulated with liveboards/answers obtained from the Thoughtspot Instance via a REST API metadata call. The content of these dropdowns can be  controlled with configuration variables such as Tags and Category. | See  REST content configuration documentation below |
+| Field| This creates a filter dropdown on a Search String embed, similar to a filter, but can be used with any TML object | The syntax for filter objects is `value:label,value:label` for example `[Region]:Region Field,[Region].east:East Filter,'top 10':Top 10 Keyword` |
+ | Search String | This will render a search embed with a specific search string. | The first part contains the TML searech - eg: [sales] [state]. The second part contains the GUUID of a datasource. These need to be seperated by a &#124;|
 
 
 ### Custom Actions
