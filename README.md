@@ -72,12 +72,24 @@ This is what will be displayed in the nav menu
 | URL | This will embed a webpage within an Iframe. Note that not all webpages allow this. As an alternative, you can link to dropbox, or place an image inside the "public" folder of this application. | Full URL |
 | Full App | This will embed the thoughtspot application, landing on the page specified in the configuration panel. | Home, Liveboards, Answers, SpotIQ,  Data |
 | Filter| This attaches a custom filter to a Liveboard or Search String embed, that can be used to supply runtime filter values.  | The Name of the filter should be your column name. The configuration section contains a comma seperated list of possible values for that filter |
+| Search String | This will render a search embed with a specific search string. | The first part contains the TML searech - eg: [sales] [state]. The second part contains the GUUID of a datasource. These need to be seperated by a vertical bar "|". |
+| REST Content List | This will create a dropdown menu, prepopulated with liveboards/answers obtained from the Thoughtspot Instance via a REST API metadata call. The content of these dropdowns can be  controlled with configuration variables such as Tags and Category. | See  REST content configuration documentation below |
 | Field| This creates a filter dropdown on a Search String embed, similar to a filter, but can be used with any TML object | The syntax for filter objects is `value:label,value:label` for example `[Region]:Region Field,[Region].east:East Filter,'top 10':Top 10 Keyword` |
  | Search String | This will render a search embed with a specific search string. | The first part contains the TML searech - eg: [sales] [state]. The second part contains the GUUID of a datasource. These need to be seperated by a &#124;|
 
 
 ### Custom Actions
 Any Custom Action that has been created as a "Callback" can be leveraged on an Answer Embed. When the action is triggered, an alert will be generated showing the name of the action that was triggered, and current dataset of the Answer.
+
+### REST Content Configuration
+Configuration options correlate directly with the V1 Metadata List API call.
+tags=Retail Sales,Retail Apparel|category=MY|sort=CREATED
+
+tags - tag names as seen in the UI (eg. Retail Sales), comma seperated list
+type - liveboard, answer, all
+category - ALL, MY, FAVORITE, REQUESTED
+sort - DEFAULT, NAME, DISPLAY_NAME, AUTHOR, CREATED, MODIFIED
+
 
 ### Disabling UI Components
 UI actions can be disabled on Answers, Liveboards, and Search Embeds. To do this, add 'disableAction' and 'enableAction' parameters to the end of the configuration. In the example below, we are disabling "Share" and "Save" on the given answer.

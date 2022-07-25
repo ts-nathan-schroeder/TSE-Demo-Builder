@@ -32,6 +32,7 @@ const [logoImage, setLogoImage] = useState('')
 const [displayPrimaryPicker, setDisplayPrimaryPicker] = useState('')
 const [displaySecondaryPicker, setDisplaySecondaryPicker] = useState('')
 
+
 useEffect(()=>{
   var objDiv = document.getElementById("linkContainer");
   objDiv.scrollTop = objDiv.scrollHeight + 30;
@@ -258,7 +259,7 @@ return (
     </div>
     <div className="settingLabel">Settings Name</div> 
     <input type="text" value={name} onChange={e => setName(e.target.value)}></input>
-    <div className="settingLabel">Thoughtspot URL</div> 
+    <div className="settingLabel">ThoughtSpot URL</div> 
     <input  type="text" value={URL} onChange={e => setURL(e.target.value)}></input>
     
     <div className="horizontalMenu">
@@ -314,11 +315,12 @@ return (
 
       </div>
     </div>
+    <div style={{display:'flex',flexDirection:'row'}}>
     <div className="button addLink" onClick={addLink}>
       <PlusIcon />
       Add Link
     </div>
-
+  </div>
   </div>
 )
 }
@@ -378,7 +380,8 @@ function Link(props){
       'Filter':'East,West,South,North',
       'Field':'[Region]:Region,[Timestamp].detailed:Detailed Time',
       'Search String':'[tml] [search] [query] |WorksheetGUID',
-      'URL':'URL of website or image'
+      'URL':'URL of website or image',
+      'Rest':'tags=Retail Sales|category=my|sort=CREATED|type=liveboard'
     }
     contentInput = <input style={{flex:1,border:'1px solid #cccccccc', borderRadius:'5px', marginRight:'5px'}} placeholder={placeholders[type]} value={content} onChange={e => handleContentChange(e.target.value)} />;
   }
@@ -404,7 +407,8 @@ function Link(props){
     'URL':'Link Name',
     'App': 'Link Name',
     'Menu': 'Menu Name',
-    'None':'Link Name'
+    'None':'Link Name',
+    'Rest':'Link Name'
   }
   return(
     <div className="link">
@@ -420,9 +424,10 @@ function Link(props){
         <option value="Search String">Search String</option>
         <option value="Filter">Filter (Liveboard & Search String)</option>
         <option value="Field">Field (Search String)</option>
+        <option value="Rest">REST Content List</option>
       </select>
       {contentInput}
-      {(type!='Menu') ? 
+      {(type!='Menu' && type!='Rest') ? 
         <select style={{width:'80px',marginRight:'5px'}} onChange={e => handleParentChange(e.target.value)} value={parent}> 
           <option value="None">None</option>
           {parentOptions}

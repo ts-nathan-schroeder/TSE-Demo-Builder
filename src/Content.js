@@ -2,6 +2,7 @@ import React, { useState, useEffect, setState } from 'react';
 import { init,  AuthType, Page, EmbedEvent, Action, HostEvent} from '@thoughtspot/visual-embed-sdk';
 import { SearchEmbed, LiveboardEmbed, AppEmbed, useEmbedRef } from '@thoughtspot/visual-embed-sdk/react';
 import { MultiSelect } from "react-multi-select-component";
+import NotePopup from './NotePopup';
 
 function Content(props) {
 const {
@@ -19,6 +20,17 @@ const [filterKey, setFilterKey] = useState('')
 const [renderKey, setRenderKey] = useState('')
 const [searchFields , setSearchFields] = useState('')
 const embedRef = useEmbedRef();
+const [popupVisible, setPopupVisible] = useState('')
+const [popupConfig, setPopupConfig] = useState('')
+const [token,setToken]=useState('')
+const [restLiveboards,setRestLiveboards] = useState('')
+const [restAnswers,setRestAnswers] = useState('')
+
+const MemorizedSearchEmbed = React.memo(SearchEmbed);
+
+function togglePopupVisible(){
+  setPopupVisible(!popupVisible)
+}
 
 useEffect(() => {
   if (settings.URL){
@@ -32,7 +44,18 @@ useEffect(() => {
     catch(err){
       alert("could not connect to thoughtspot")
     }
+    if (settings.username){
+      
+      //getToken()
+    }
   }
+
+  loadDefaultFilters();
+  loadRestContent();
+
+
+}, [])
+function loadDefaultFilters(){
   var defaultFilters = {}
   if (settings.links){
     var filterObjs = []
@@ -66,8 +89,7 @@ useEffect(() => {
   } 
   if (!runFilters && !defaultsFound) setRunFilters([])
   if (!selectedFilters && !defaultsFound)  setSelectedFilters({})
-}, [])
-
+}
 function renderLink(type,content,name){
   setRenderContent(content);
   setRenderType(type);
@@ -99,7 +121,6 @@ function buildSearchString(searchingFields,filteringFields){
     } 
     }
   }
-
   if (filteringFields){
     for (var filter of filteringFields){
       var filterVals = filter.values
@@ -114,14 +135,85 @@ function buildSearchString(searchingFields,filteringFields){
 
 
 function setField(key,fields){
-  // embedRef.current.trigger(HostEvent.Search, {
+    // embedRef.current.trigger(HostEvent.Search, {
   //   searchQuery: buildSearchString(fields, null),
   //   executeSearch: true,
 
   // });
   setSearchFields({ ...searchFields, [key]: fields });
-
 }
+// =============
+// REST CONTENT
+// =============
+async function loadRestContent(){
+  var restConfigs = []
+  for (var link of settings.links){
+    if (settings.linkTypes[link]=='Rest'){
+      var type = "all"
+      var restURLParams = "" 
+      var catType = "ALL"
+      var batchsize = 5
+      if (settings.linkContents[link]){
+        var params = settings.linkContents[link].split("|")
+        for (var param of params){
+          var paramKey = param.split("=")[0]
+          var paramVal = param.split("=")[1]
+          if (paramKey=="type"){
+            type = paramVal
+          }
+          if (paramKey=="sort"){
+            restURLParams+="&sort="+paramVal
+          }
+          if (paramKey=="tags"){
+            restURLParams+="&tagname="+encodeURIComponent(JSON.stringify(paramVal.split(",")));
+          }
+          if (paramKey=="category"){
+            catType = paramVal.toUpperCase();
+          } 
+      }    
+      }
+      restURLParams+="&category="+catType+"&batchsize="+batchsize;
+      restConfigs.push({type:type,link:link,restURLParams:restURLParams})
+    }
+  }
+  if (restConfigs.length>0){
+    var restAnswersCopy = {}
+    var restLiveboardsCopy = {}
+    for (var config of restConfigs){
+      if (config.type=='all' || config.type=='liveboard'){
+        var liveboards = await getLiveboards(config.restURLParams);
+      }
+      if (config.type=='all' || config.type=='answer'){
+        var answers = await getAnswers(config.restURLParams)
+      }
+      if (liveboards.length>0){
+        restLiveboardsCopy[config.link] = liveboards 
+      }
+      if (answers.length>0){
+        restAnswersCopy[config.link] = answers
+      }
+    }
+    setRestLiveboards(restLiveboardsCopy)
+    setRestAnswers(restAnswersCopy)
+  }
+}
+async function getLiveboards(restURLParams){
+  return await fetch(settings.URL+"callosum/v1/tspublic/v1/metadata/list?type=PINBOARD_ANSWER_BOOK"+restURLParams,
+  {
+    credentials: 'include',
+  })
+  .then(response => response.json()).then(
+    data => data.headers)
+}
+async function getAnswers(restURLParams){
+  return await fetch(settings.URL+"callosum/v1/tspublic/v1/metadata/list?type=QUESTION_ANSWER_BOOK"+restURLParams,
+  {
+    credentials: 'include',
+  })
+  .then(response => response.json()).then(
+    data => data.headers)
+}
+
 function setFilter(newFilterObj){
   var filterObjs = runFilters;
   var found = false;
@@ -141,7 +233,6 @@ function setFilter(newFilterObj){
   }else{
     setRunFilters(filterObjs);
     setRenderKey(Date.now())
-
     // embedRef.current.trigger(HostEvent.Search, {
     //   searchQuery: buildSearchString(null,filterObjs)
     // });
@@ -149,6 +240,22 @@ function setFilter(newFilterObj){
 
 }
 function onEmbedRendered(){
+  embedRef.current.on(EmbedEvent.MakeACopy,(data) => {
+    console.log("copy!")
+    //loadRestContent();
+  })
+  embedRef.current.on(EmbedEvent.Save,(data) => {
+    console.log("save!")
+    //loadRestContent();
+  })
+  embedRef.current.on(EmbedEvent.VizPointDoubleClick, (data) => {
+      console.log('>>> called', data);
+      const event = new CustomEvent('popup', {detail: {data: data}});
+      window.dispatchEvent(event)
+  })
+  embedRef.current.on(EmbedEvent.VizPointClick, (data) => {
+    console.log('single click');
+  })
   embedRef.current.on(EmbedEvent.CustomAction, (payload) => {
     
     var data = payload.data.embedAnswerData.data[0].columnDataLite
@@ -159,6 +266,7 @@ function onEmbedRendered(){
     alert(alertString);
   })
 }
+
 var isHorizontal = (settings.orientation=='Horizontal') 
 
 if (settings.links){
@@ -171,6 +279,37 @@ if (settings.links){
   }
   for (var link of topLevel){
     var childrenLinks = []
+    console.log("rest answers",restAnswers,restLiveboards)
+    if (settings.linkTypes[link]=='Rest' && restAnswers && restAnswers[link]){
+      for (var contentItem of restAnswers[link]){
+        childrenLinks.push(
+          <LinkContainer
+          key={contentItem.id}
+          id={contentItem.id}
+          name={contentItem.name}
+          content={contentItem.id}
+          type="Answer"
+          renderLink={renderLink}
+          isHorizontal={isHorizontal}
+        />
+        )       
+      }
+    }
+    if (settings.linkTypes[link]=='Rest' && restLiveboards && restLiveboards[link]){
+      for (var contentItem of restLiveboards[link]){
+        childrenLinks.push(
+          <LinkContainer
+          key={contentItem.id}
+          id={contentItem.id}
+          name={contentItem.name}
+          content={contentItem.id}
+          type="Liveboard"
+          renderLink={renderLink}
+          isHorizontal={isHorizontal}
+        />
+        )       
+      }
+    }
     for (var child of settings.links){
       if (settings.linkParents[child]==settings.linkNames[link]){
         childrenLinks.push(
@@ -251,7 +390,6 @@ if (settings.links){
 }
 
 //Set primary CSS variables for page
-
 document.documentElement.style.setProperty('--primary-color', settings.primaryColor);
 document.documentElement.style.setProperty('--secondary-color', settings.secondaryColor);
 
@@ -265,6 +403,7 @@ if (!isHorizontal){
   document.documentElement.style.setProperty('--dropdown-container-bottom-margin', '10px');
   document.documentElement.style.setProperty('--dropdown-left-margin', '130px');
   document.documentElement.style.setProperty('--dropdown-top-margin', '-240px');
+  document.documentElement.style.setProperty('--dropdown-top-margin', '-240px');
   document.documentElement.style.setProperty('--dropdown-max-height', '240px');
 
 }else{
@@ -277,7 +416,6 @@ if (!isHorizontal){
   document.documentElement.style.setProperty('--dropdown-left-margin', '0px');
   document.documentElement.style.setProperty('--dropdown-top-margin', '0px');
   document.documentElement.style.setProperty('--dropdown-max-height', '500px');
-
 }
 
 var enabledActions = []
@@ -314,7 +452,7 @@ if (renderType=='Search'){
   if (renderContent && renderContent.length>0){
     renderContents = renderContent.split("|")[0].split(",")
   }
-  renderPage = <SearchEmbed 
+  renderPage = <MemorizedSearchEmbed 
       enabledActions={enabledActions.length>0 ? enabledActions : null} 
       disabledActions={disabledActions.length>0 ? disabledActions : null} 
       dataSources={renderContents} 
@@ -335,7 +473,7 @@ if (renderType=='Liveboard'){
   />
 }
 if (renderType=='Answer'){
-  renderPage = <SearchEmbed ref={embedRef} 
+  renderPage = <MemorizedSearchEmbed ref={embedRef} 
       enabledActions={enabledActions.length>0 ? enabledActions : null} 
       disabledActions={disabledActions.length>0 ? disabledActions : null}  
       onLoad={onEmbedRendered}  
@@ -380,7 +518,9 @@ return (
         <div style={isHorizontal ? logoImageHolderHorizontal: logoImageHolderVertical}>
           <img src={settings.logoImage} style={isHorizontal ? horizontalLogoImage : verticalLogoImage}></img>
         </div>
-
+        <div>
+        <NotePopup  popupVisible={popupVisible} togglePopupVisible={togglePopupVisible} popupConfig={popupConfig} primaryColor={settings.primaryColor} secondaryColor={settings.secondaryColor}></NotePopup> 
+      </div>
         {linkContainers}
         <div style={isHorizontal ? horizontalIcons : verticalIcons}>
           {!isHorizontal ? <div style={{margin:'10px',}}>
@@ -566,7 +706,8 @@ const hoverMenuHorizontal ={
 }
 const hoverMenuVertical = {
   position: 'absolute',
-  width: '150px',
+  width: '200px',
+  paddingRight:'10px',
   left: '150px',
   marginTop:'-29px',
 }
