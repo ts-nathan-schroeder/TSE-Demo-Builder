@@ -7,11 +7,9 @@
     border-radius: 10px;
 }
 .bk-pinboard-data-viz{
-    border: 1px solid #80b6ee !important;
-    border-radius: 10px;
     box-shadow: none !important;
 }
 .rd-button{
     background: none !important;
-    box-shadow: 0 0 10px #cccccc !important;
+    box-shadow: 0 0 5px #aaaaaa !important;
 }
