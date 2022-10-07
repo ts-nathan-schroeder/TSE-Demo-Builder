@@ -13,3 +13,9 @@
     background: none !important;
     box-shadow: 0 0 5px #aaaaaa !important;
 }
+.bk-title{
+    font-size:10px !important;
+}
+.bk-pinboard-data-viz .bk-pinboard-viz-header{
+    -ms-flex-basis: none !important;
+}
