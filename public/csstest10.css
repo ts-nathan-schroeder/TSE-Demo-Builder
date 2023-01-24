@@ -1,0 +1,4 @@
+div.bk-dialog.small:not(.resizable){
+    width:100%!important;   
+    max-width:100%;
+}
